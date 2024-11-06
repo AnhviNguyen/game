@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="900" height="900" style="border:1px solid darkcyan;">
+        Your browser does not support the HTML5 canvas tag.
+    </canvas>
+
+
+    <script>
+        let canvas;
+        let context;
+
+        window.onload = init;
+
+        function init(){
+
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+
+            myLogo();
+        }
+        
+        function myLogo() {
+
+            context.beginPath();
+            context.arc(200, 200, 30, 0, 2 * Math.PI);
+            context.fillStyle = '#ff9800';
+            context.fill();
+           
+            context.fillStyle = '#fbfbfd';
+            context.rect(150, 160, 200, 85);
+            context.strokeStyle = '#070916';
+            context.stroke();
+            
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('Logo', 250, 210);
+        }
+    </script>
+</body>
+</html>

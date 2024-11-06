@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="900" height="900" style="border:1px solid darkcyan;">
+        Your browser does not support the HTML5 canvas tag.
+    </canvas>
+
+    <script>
+         let canvas;
+        let context;
+
+        window.onload = init;
+
+        function init(){
+
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+
+            myChart();
+        }
+
+        function myChart(){
+            context.beginPath();
+            context.moveTo(50, 50);
+            context.lineTo(50, 500);
+            context.stroke();
+
+            context.beginPath();
+            context.moveTo(50, 500);
+            context.lineTo(800, 500);
+            context.stroke();
+
+            context.fillStyle = '#3f51b5';
+            context.fillRect(100, 195, 70, 305);
+
+            context.fillStyle = '#3f51b5';
+            context.fillRect(220, 245, 70, 255);
+
+            context.fillStyle = '#3f51b5';
+            context.fillRect(350, 355, 70, 145);
+
+            context.fillStyle = '#3f51b5';
+            context.fillRect(470, 205, 70, 295);
+
+            context.fillStyle = '#3f51b5';
+            context.fillRect(590, 395, 70, 105);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('2020', 120, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('2021', 240, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('2022', 370, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('2023', 490, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('2024', 610, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('Years', 800, 530);
+
+            context.font = '20px Arial';
+            context.fillStyle = '#3f51b5';
+            context.fillText('Salary', 10, 30);
+        }
+    </script>
+
+</body>
+</html>
