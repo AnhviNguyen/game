@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrawShape, Path end Text </title>
+</head>
+<body>
+    <canvas id="canvas" width="750" height="400" style="border:1px solid darkcyan;">
+        Your browser does not support the HTML5 canvas tag.
+    </canvas>
+
+    <script>
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext('2d');
+
+        // Draw a rectangle
+        // context.fillStyle = '#ff8080';
+        // context.fillRect(100, 50, 100, 75);
+
+        // Draw a cỉcle
+        // context.beginPath();
+        // context.arc(200, 100, 50, 0, 2 * Math.PI);
+        // context.fill();
+
+        // Draw a strike 
+        // context.beginPath();
+        // context.moveTo(50, 50);
+        // context.lineTo(250, 150);
+        // context.stroke();
+
+        //Draw a triangle
+        context.beginPath();
+        context.moveTo(200, 100);
+        context.lineTo(250, 150);
+        context.lineTo(250, 50);
+        context.fill();
+    </script>
+
+    
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+
+        <title>HTML5 Game</title>
+        <meta name="description" content="A basic HTML5 game">
+        <meta name="author" content="[Your name]">
+    </head>
+    <body>
+
+        <canvas id="canvas" width="800" height="600" style="border:1px solid darkcyan;">
+            Your browser does not support the HTML5 canvas tag.
+        </canvas>
+
+        <script>
+            "use strict"; //telling the browser to run the code in strict mode
+            let canvas;
+            let context;
+
+            window.onload = init; //Sự kiện window.onload sẽ kích hoạt khi toàn bộ trang đã được tải xong, 
+            //đảm bảo tất cả các phần tử và tài nguyên trên trang đều có sẵn trước khi mã của bạn được thực thi
+            //nếu không thì xảy ra lỗi " an error saying there is no canvas element."
+
+            let x = 100;
+            let y = 100;
+            let color = '#ff8080';
+            let clicked = false;
+
+            function init(){
+                //canvas được lưu trữ để tham khảo sau này bằng cách gọi getElementById() để truy xuất phần tử canvas.
+                canvas = document.getElementById('canvas'); 
+                //Gọi getContext() để truy xuất ngữ cảnh từ canvas. '2d' được chuyển làm đối số để nhận được đối tượng CanvasRenderingContext2D.
+                context = canvas.getContext('2d');
+
+                canvas.addEventListener('click', changeColor);
+
+                draw();
+            }
+
+            function draw(){
+            // Get a random color, red or blue
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                // let randomColor = Math.random() > 0.5? '#ff8080' : '#0099b0';
+                
+                let gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, "#ff1b2e"); // Màu bắt đầu (góc trên)
+                gradient.addColorStop(1, "#fad0c4"); // Màu kết thúc (góc dưới)
+                context.fillStyle = gradient;
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw a rectangle
+                
+                // context.fillRect(100, 50, 200, 175); //lan luot la x,y,width,height
+                // Draw a circle   
+                
+                context.beginPath(); // tạo một đường dẫn mới tránh việc vẽ lên nhau 
+                context.arc(x, y, 50, 0, 2 * Math.PI); //lan luot la x,y,radius,startAngle,endAngle
+                context.fillStyle = color;
+                context.fill();//fillRect() được sử dụng để vẽ một hình chữ nhật đầy màu sắc.
+
+                if (x > canvas.width+50){
+                    x = 0;
+                }
+                x+=1
+
+                requestAnimationFrame(draw);
+            }
+
+            function changeColor(event){
+                (clicked) ? color = '#ff1580' : color ='#0099b0';
+                clicked = !clicked;
+            }
+
+        </script>
+    </body>
+</html>
