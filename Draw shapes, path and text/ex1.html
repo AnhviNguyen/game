@@ -6,7 +6,7 @@
     <title>DrawShape, Path end Text </title>
 </head>
 <body>
-    <canvas id="canvas" width="750" height="400" style="border:1px solid darkcyan;">
+    <canvas id="canvas" width="900" height="900" style="border:1px solid darkcyan;">
         Your browser does not support the HTML5 canvas tag.
     </canvas>
 
@@ -31,10 +31,24 @@
 
         //Draw a triangle
         context.beginPath();
-        context.moveTo(200, 100);
-        context.lineTo(250, 150);
-        context.lineTo(250, 50);
+        context.moveTo(300, 100);
+        context.lineTo(100, 300);
+        context.lineTo(500, 300);
+        context.fillStyle = '#ff1b2e';
         context.fill();
+
+        context.fillStyle = '#666666';
+        context.fillRect(150, 300, 300, 300);
+
+        context.fillStyle = '#008000';
+        context.fillRect(250, 430, 100, 170);
+
+        context.fillStyle = '#FFFF00';
+        context.fillRect(170, 320, 100, 100);
+
+        context.fillStyle = '#FFFF00';
+        context.fillRect(330, 320, 100, 100);
+
     </script>
 
     
