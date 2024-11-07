@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="82.822617mm"
+   height="75.233742mm"
+   viewBox="0 0 82.822617 75.233742"
+   version="1.1"
+   id="svg1"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="82.822617"
+       height="75.233742"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-9.2584715,-10.074435)">
+    <path
+       sodipodi:type="spiral"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264583"
+       id="path1"
+       sodipodi:cx="46.874512"
+       sodipodi:cy="51.485123"
+       sodipodi:expansion="1"
+       sodipodi:revolution="3"
+       sodipodi:radius="45.663708"
+       sodipodi:argument="-18.594374"
+       sodipodi:t0="0"
+       d="m 46.874512,51.485123 c 2.215365,0.577921 0.313957,3.271394 -0.960543,3.682083 -3.453816,1.112941 -6.239757,-2.513489 -6.403623,-5.603169 -0.293117,-5.526712 5.11053,-9.361951 10.245794,-9.125163 7.536206,0.347496 12.545638,7.731584 11.846703,14.888419 C 60.671273,64.866229 51.243152,71.080956 42.071798,69.895537 30.530586,68.403808 23.0979,56.904736 24.782015,45.721867 26.821702,32.177914 40.405546,23.520732 53.59831,25.710543 69.145527,28.291158 79.031065,43.967802 76.331175,59.169464 73.214044,76.720385 55.439521,87.836765 38.229628,84.623868 18.674653,80.973171 6.3257316,61.097348 10.053683,41.879696 14.235881,20.320394 36.215416,6.7377143 57.440481,10.982211 81.004326,15.694407 95.821666,39.77942 91.059506,63.011635"
+       inkscape:export-filename="path1.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </g>
+</svg>

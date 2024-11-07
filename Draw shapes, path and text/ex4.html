@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Canvas Clock</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      background-color: rgb(173, 26, 26);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="clock" width="500" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById('clock');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.width / 2;
+    ctx.translate(radius, radius);
+
+    function drawClock() {
+      //bat dau tu vi tri top left cua canvas
+      ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
+      drawFace(ctx, radius);
+      drawNumbers(ctx, radius);
+      drawTime(ctx, radius);
+    }
+
+    function drawFace(ctx, radius) {
+      ctx.beginPath();
+      ctx.arc(0, 0, radius , 0, 2 * Math.PI);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = radius * 0.09;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+    }
+
+    function drawNumbers(ctx, radius) {
+      ctx.font = `${radius * 0.15}px Arial`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      for (let num = 1; num <= 12; num++) {
+        const angle = (num * Math.PI) / 6 - Math.PI / 2;
+        // 1 circle co 2pi, chia deu cho 12 so thi moi so se chiem pi/6
+        //*0.75 de nam ben trong hinh trong
+        // su dung hinh tron luong giac de tim toa do cua diem 
+        const x = radius * 0.75 * Math.cos(angle);
+        const y = radius * 0.75 * Math.sin(angle);
+        ctx.fillText(num.toString(), x, y);
+      }
+    }
+
+    function drawTime(ctx, radius) {
+      const now = new Date();
+      // chuyen doi tu dang gio (24h) sang 12h (tren mat dong ho)
+      const hour = now.getHours() % 12;
+      const minute = now.getMinutes();
+      const second = now.getSeconds();
+
+      // Hour 
+      // chuyen tat ca sang gio * pi/6 (tren 1 mat dong ho co 12h)
+      const hourAngle = ((hour + minute / 60) * Math.PI) / 6;
+      drawHand(ctx, hourAngle, radius * 0.5, radius * 0.07);
+
+      //1 gio co 60 phut => 2pi/60
+      const minuteAngle = (minute * Math.PI) / 30;
+      drawHand(ctx, minuteAngle, radius * 0.75, radius * 0.05);
+
+      // tuong tu
+      const secondAngle = (second * Math.PI) / 30;
+      drawHand(ctx, secondAngle, radius * 0.9, radius * 0.02, 'red');
+    }
+
+    function drawHand(ctx, pos, length, width, color = '#333') {
+      ctx.beginPath();
+      ctx.lineWidth = width;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = color;
+      ctx.moveTo(0, 0);
+      ctx.rotate(pos);
+      ctx.lineTo(0, -length);
+      ctx.stroke();
+      ctx.rotate(-pos);
+    }
+
+    // Update clock every second
+    setInterval(drawClock, 1000);
+    drawClock();  // Initial call
+  </script>
+</body>
+</html>

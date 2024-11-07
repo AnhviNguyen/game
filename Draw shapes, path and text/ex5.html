@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500" style="border:1px solid lightgray;"></canvas>
+    </canvas>
+
+    <script>
+        let canvas;
+        let context;
+
+        window.onload = init;
+
+        function init(){
+
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+
+            myPath();
+        }
+
+        function myPath(){
+            const centerX = canvas.width / 3;
+            const centerY = canvas.height / 2; 
+            context.translate(centerX, centerY);
+
+            context.beginPath();
+            let path = new Path2D('m 46.874512,51.485123 c 2.215365,0.577921 0.313957,3.271394 -0.960543,3.682083 -3.453816,1.112941 -6.239757,-2.513489 -6.403623,-5.603169 -0.293117,-5.526712 5.11053,-9.361951 10.245794,-9.125163 7.536206,0.347496 12.545638,7.731584 11.846703,14.888419 C 60.671273,64.866229 51.243152,71.080956 42.071798,69.895537 30.530586,68.403808 23.0979,56.904736 24.782015,45.721867 26.821702,32.177914 40.405546,23.520732 53.59831,25.710543 69.145527,28.291158 79.031065,43.967802 76.331175,59.169464 73.214044,76.720385 55.439521,87.836765 38.229628,84.623868 18.674653,80.973171 6.3257316,61.097348 10.053683,41.879696 14.235881,20.320394 36.215416,6.7377143 57.440481,10.982211 81.004326,15.694407 95.821666,39.77942 91.059506,63.011635');
+            context.strokeStyle = '#0099b0';
+            context.stroke(path);
+
+            context.font = `15px Arial Bold`;
+            context.textBaseline = 'middle';
+            context.textAlign = 'center';
+            context.fillText('My logo', 130, 50)
+        }
+
+
+    </script>
+</body>
+</html>
