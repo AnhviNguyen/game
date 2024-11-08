@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball with FPS Control</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        "use strict";
+        let canvas = document.getElementById('canvas');
+        let context = canvas.getContext('2d');
+
+        let fps;  // Instantaneous frame rate for each frame
+        let clicked = false; // Toggle between normal FPS and 30 FPS
+        let oldTimeStamp = 0; // Last timestamp for calculating FPS
+        let fpsArray = []; // Array to store FPS values over the last second
+        let fpsAverage = 0; // The averaged FPS over the last second
+        let lastSecond = 0; // Time of the last second mark
+
+        // Ball properties
+        let ball = {
+            x: 100,
+            y: 100,
+            radius: 20,
+            speedX: 600, // pixels per second
+            speedY: 600, // pixels per second
+            color: '#FF9800'
+        };
+
+        // Initialize animation
+        window.onload = () => {
+            window.requestAnimationFrame(gameLoop);
+            canvas.addEventListener('click', toggleFps);
+        };
+
+        // Toggle frame rate between normal and 30 FPS
+        function toggleFps() {
+            clicked = !clicked;
+        }
+
+        function gameLoop(timeStamp) {
+            // Calculate time difference in seconds
+            let secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            fps = Math.round(1 / secondsPassed);
+            fpsArray.push(fps);
+
+            // Every second, calculate the average FPS from fpsArray
+            if (timeStamp - lastSecond >= 1000) {
+                fpsAverage = Math.round(fpsArray.reduce((a, b) => a + b, 0) / fpsArray.length);
+                fpsArray = []; // Reset the FPS array for the next second
+                lastSecond = timeStamp;
+            }
+
+            // Move the ball
+            updateBallPosition(secondsPassed);
+
+            // Clear and draw
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+
+            // Draw Average FPS
+            context.fillStyle = 'black';
+            context.font = '20px Arial';
+            context.fillText("Average FPS: " + fpsAverage, 10, 25);
+
+            // Request the next frame with adjusted FPS
+            if (clicked) {
+                setTimeout(() => window.requestAnimationFrame(gameLoop), 1000 / 30);
+            } else {
+                window.requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function updateBallPosition(secondsPassed) {
+            // Move the ball based on speed and time passed
+            ball.x += ball.speedX * secondsPassed;
+            ball.y += ball.speedY * secondsPassed;
+
+            // Check for collision with the canvas edges
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                ball.speedX = -ball.speedX; // Reverse horizontal direction
+            }
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                ball.speedY = -ball.speedY; // Reverse vertical direction
+            }
+        }
+
+        function drawBall() {
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = ball.color;
+            context.fill();
+            context.closePath();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- window.requestAnimationFrame() to tell the browser you want to request a repaint for an animation, or in this case a game. -->
+     <!-- tương tự như setTimeout và setTimeout -->
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        "use strict";
+        let canvas;
+        let context;
+        let secondsPassed;
+        let oldTimeStamp =0 ;
+        let fps;
+        let x = 60; 
+        let clicked = false;
+
+    
+        window.onload = init;
+    
+        function init(){
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+    
+            // Start the first frame request
+            window.requestAnimationFrame(gameLoop);
+            canvas.addEventListener('click', changeFps);
+        }
+    
+        function gameLoop(timeStamp) {
+
+            // Calculate the number of seconds passed since the last frame
+            //Chia cho 1000 để chuyển đổi từ mili giây sang giây
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            // Calculate fps
+            fps = Math.round(1 / secondsPassed);
+
+            // Draw number to the screen
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, 200, 100);
+            context.font = '25px Arial';
+            context.fillStyle = 'black';
+            context.fillText("FPS: " + fps, 10, 30);
+
+            // Perform the drawing operation
+            draw(x);
+            x+= 2;
+            if ( x > canvas.width + 30 ){ x= 0}
+
+            if (clicked){
+                setTimeout(() => window.requestAnimationFrame(gameLoop), 1000 / 30); 
+            }else{
+                window.requestAnimationFrame(gameLoop);
+            }
+
+            // The loop function has reached it's end. Keep requesting new frames
+            
+        }
+    
+        function draw(positionX){
+            context.beginPath(); 
+            context.arc(positionX, 200, 30, 0, 2 * Math.PI);
+            context.fillStyle = '#ff9800';
+            context.fill();
+        }
+
+        function changeFps(){
+            clicked = !clicked
+        }
+    </script>
+</body>
+</html>

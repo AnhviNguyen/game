@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- window.requestAnimationFrame() to tell the browser you want to request a repaint for an animation, or in this case a game. -->
+     <!-- tương tự như setTimeout và setTimeout -->
+    <canvas id="canvas" width="900" height="900" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        "use strict";
+        let canvas;
+        let context;
+        let secondsPassed;
+        let oldTimeStamp =0 ;
+        let fps;
+
+    
+        window.onload = init;
+    
+        function init(){
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+    
+            // Start the first frame request
+            window.requestAnimationFrame(gameLoop);
+        }
+    
+        function gameLoop(timeStamp) {
+
+            // Calculate the number of seconds passed since the last frame
+            //Chia cho 1000 để chuyển đổi từ mili giây sang giây
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            // Calculate fps
+            fps = Math.round(1 / secondsPassed);
+
+            // Draw number to the screen
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, 200, 100);
+            context.font = '25px Arial';
+            context.fillStyle = 'black';
+            context.fillText("FPS: " + fps, 10, 30);
+
+            // Perform the drawing operation
+            draw();
+
+            // The loop function has reached it's end. Keep requesting new frames
+            window.requestAnimationFrame(gameLoop);
+        }
+    
+        function draw(){
+            let randomColor = Math.random() > 0.5? '#ff8080' : '#0099b0';
+            context.fillStyle = randomColor;
+            context.fillRect(100, 50, 200, 175);
+        }
+    </script>
+</body>
+</html>
