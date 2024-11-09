@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Motion</title>
+</head>
+<body>
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const [centerX, centerY] = [canvas.width / 3, canvas.height / 3];
+        let [rectX, rectY] = [0, 0];
+        const radius = 150;
+        let angle1 = 0;
+        let angle2 =0;
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            updatePosition(angle1);
+            ctx.fillStyle = '#ff8080';
+            ctx.fillRect(rectX, rectY, 50, 30);
+            angle1 += 0.02; 
+
+            updatePosition(angle2);
+            ctx.fillStyle = '#ff8080';
+            ctx.fillRect(rectX, rectY, 50, 30);
+            angle2 -= 0.02; 
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updatePosition(angle){
+            rectX = centerX + radius * Math.cos(angle);
+            rectY = centerY + radius * Math.sin(angle);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

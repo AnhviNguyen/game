@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        let rectX = 0;
+        let rectY = 0;
+        let secondsPassed = 0;
+        let oldTimeStamp = 0;
+        let movingSpeed = 50;
+
+
+        function gameLoop(timeStamp) {
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            update();
+            draw();
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            rectX += (movingSpeed * secondsPassed);
+            rectY += (movingSpeed * secondsPassed);
+        }
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.fillStyle = '#ff8080';
+            context.fillRect(rectX, rectY, 150, 100);
+        }
+
+        window.requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
