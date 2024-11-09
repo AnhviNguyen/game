@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid lightgray;"></canvas>
+    
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let x = 0;
+        let y = 0;
+        let speedX = 400;
+        let speedY = 400;
+        let secondsPassed = 0;
+        let oldTimeStamp =0;
+        const rectWidth = 50;
+        const rectHeight = 30;
+
+        function gameLoop(timeStamp) {
+
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            updatePosition();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff8080';
+            ctx.fillRect(x, y, rectWidth, rectHeight);
+            
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updatePosition(){
+            x += speedX*secondsPassed;
+            y += speedY*secondsPassed;
+
+            if (x <= 0 || x + rectWidth >= canvas.width) {
+                speedX = -speedX; // Đảo ngược hướng ngang
+            }
+            if (y <= 0 || y + rectHeight >= canvas.height) {
+                speedY = -speedY; // Đảo ngược hướng dọc
+            }
+        }
+        requestAnimationFrame(gameLoop);
+
+    </script>
+</body>
+</html>

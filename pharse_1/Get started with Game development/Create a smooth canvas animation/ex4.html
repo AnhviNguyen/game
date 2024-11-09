@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid lightgray;"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let x =50;
+        let y = 50;
+        let [up, down, left, right] = [false, false, false, false];
+        let secondsPassed =0;
+        let oldTimeStamp =0;
+
+
+        // keydown: nhan vao phim
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp") up = true;
+            if (event.key === "ArrowDown") down = true;
+            if (event.key === "ArrowLeft") left = true;
+            if (event.key === "ArrowRight") right = true;
+        });
+
+        // keyup: nha phim
+        window.addEventListener("keyup", (event) => {
+            if (event.key === "ArrowUp") up = false;
+            if (event.key === "ArrowDown") down = false;
+            if (event.key === "ArrowLeft") left = false;
+            if (event.key === "ArrowRight") right = false;
+        });
+
+        function gameLoop(timeStamp){
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            fps = Math.round(1 / secondsPassed);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            updatePosition()
+            draw(x, y);
+
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.fillText("FPS: " + fps, 10, 25);
+
+            requestAnimationFrame(gameLoop);
+
+        }
+
+        function updatePosition(){
+            if (up) y -= 2; 
+            if (down) y += 2; 
+            if (left) x -= 2; 
+            if (right) x += 2; 
+        }
+
+        function draw(x, y){
+            ctx.beginPath();
+            ctx.arc(x, y, 50, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ff9800';
+            ctx.fill();
+        }
+
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
