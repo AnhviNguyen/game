@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1000" height="1000"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+        let position = { x: 100, y: 100 }; // Starting position
+        let velocity = { x: 5, y: 1 };     // Speed and direction of movement 
+        
+        function drawCircle(position) {
+            context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            context.beginPath();
+            context.arc(position.x, position.y, 20, 0, Math.PI * 2); // Draw circle
+            context.fillStyle = "blue";
+            context.fill();
+            context.closePath();
+        }   
+        function updatePosition() {
+            position = addVectors(position, velocity);
+        }
+
+        function multiplyVector(v, scalar) {
+            return { x: v.x * scalar, y: v.y * scalar };
+        }
+
+        function addVectors(v1, v2) {
+            return { x: v1.x + v2.x, y: v1.y + v2.y };
+        }
+
+        function gameLoop() {
+            updatePosition();
+            drawCircle(position);
+            requestAnimationFrame(gameLoop); // Call gameLoop on the next frame
+        }
+
+        gameLoop()
+    </script>
+    
+</body>
+</html>
