@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="900" height="700" style="border:1px solid lightgray"></canvas>
+
+    <script type="module">
+        import { Vector } from './ex1.js';
+
+        let canvas;
+        let context;
+        let balls = [];
+        let numBall = 30;
+
+        window.onload = init;
+
+        function init(){
+            canvas = document.getElementById('gameCanvas');
+            context = canvas.getContext('2d');
+
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i =0; i< numBall; i++){
+                let x = Math.floor(Math.random()* canvas.width);
+                let y = Math.floor(Math.random()* canvas.height);
+                let position = new Vector(x, y);
+                let velocity = new Vector(Math.random()*5, Math.random()*5);
+                let color = getRandomColor();
+                balls.push({ position, velocity, color });
+            }
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop(){
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < balls.length; i++) {
+                updatePosition(balls[i]);
+                drawBall(balls[i]);
+            }
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+
+        function updatePosition(ball) {
+            ball.position = ball.position.addVectors(ball.velocity);
+
+            if (ball.position.x <= 0 || ball.position.x >= canvas.width -25) {
+                ball.velocity.x *= -1;
+            }
+            if (ball.position.y <= 0 || ball.position.y >= canvas.height-25) {
+                ball.velocity.y *= -1;
+            }
+        }
+
+        function drawBall (ball){
+            context.beginPath();
+            context.arc(ball.position.x, ball.position.y, 25, 0, 2 * Math.PI);
+            context.fillStyle = ball.color;
+            context.fill();
+        }
+
+        function getRandomColor() {
+            let r = Math.floor(Math.random() * 256);
+            let g = Math.floor(Math.random() * 256);
+            let b = Math.floor(Math.random() * 256);
+
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+    </script>
+</body>
+</html>

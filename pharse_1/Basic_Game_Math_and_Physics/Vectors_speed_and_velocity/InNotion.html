@@ -13,13 +13,13 @@
         const context = canvas.getContext("2d");
 
         let position = { x: 100, y: 100 }; // Starting position
-        let velocity = { x: 5, y: 1 };     // Speed and direction of movement 
+        let velocity = { x: 2, y: 1 };     // Speed and direction of movement 
         
         function drawCircle(position) {
             context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
             context.beginPath();
             context.arc(position.x, position.y, 20, 0, Math.PI * 2); // Draw circle
-            context.fillStyle = "blue";
+            context.fillStyle = "#994C00";
             context.fill();
             context.closePath();
         }   
@@ -35,10 +35,26 @@
             return { x: v1.x + v2.x, y: v1.y + v2.y };
         }
 
+        function normalize(v) {
+            let mag = magnitude(v);
+            return { x: v.x / mag, y: v.y / mag };
+        }
+
+        function magnitude(v) {
+            return Math.sqrt(v.x * v.x + v.y * v.y);
+        }
+
         function gameLoop() {
+            
+            setDirection(0, 6, 10);
             updatePosition();
             drawCircle(position);
             requestAnimationFrame(gameLoop); // Call gameLoop on the next frame
+        }
+
+        function setDirection(x, y, speed) {
+            let newDirection = normalize({ x: x, y: y });
+            velocity = multiplyVector(newDirection, speed);
         }
 
         gameLoop()
