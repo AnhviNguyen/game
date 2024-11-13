@@ -22,8 +22,8 @@
             canvas = document.getElementById('gameCanvas');
             context = canvas.getContext('2d');
             window.addEventListener('keydown', handleKeyDown);
-            position = new Vector(0, 0);
-            velocity = new Vector(1, 1);
+            position = new Vector(canvas.width/2, 0);
+            velocity = new Vector(0, 1);
 
             window.requestAnimationFrame(gameLoop);
         }

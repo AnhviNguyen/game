@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="500" style="border:1px solid lightgray"></canvas>
+
+    <script>
+        var canvas = document.getElementById("gameCanvas");
+        var context = canvas.getContext("2d");
+        let isOnGround = false;
+        const gravity = 0.5;
+        var balls =[
+            {
+                position: {x: 100, y: 30},
+                velocity: {x: 1, y: 0},
+                radius: 30,
+                color: "red"
+            },
+
+            {
+                position: {x: 170, y: 29},
+                velocity: {x: 2, y: 0},
+                radius: 25,
+                color: "blue"
+            },
+
+            {
+                position: {x: 220, y: 28},
+                velocity: {x: 3, y: 0},
+                radius: 10,
+                color: "green"
+            },
+
+            {
+                position: {x: 250, y: 31},
+                velocity: {x: 2, y: 0},
+                radius: 15,
+                color: "black"
+            },
+
+            {
+                position: {x: 300, y: 35},
+                velocity: {x: 1, y: 0},
+                radius: 20,
+                color: "pink"
+            },
+        ];
+        
+
+        function drawBall(ball) {
+            context.beginPath();
+            context.arc(ball.position.x, ball.position.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = ball.color;
+            context.fill();
+            context.closePath();
+        }
+
+        function applyGravity(ball) {
+            ball.velocity.y += gravity;
+            ball.position.x += ball.velocity.x; 
+            ball.position.y += ball.velocity.y;
+        }
+
+        function checkCollision(ball) {
+            if (ball.position.y + ball.radius >= canvas.height) {
+                ball.velocity.y *= -0.9; 
+                ball.position.y = canvas.height - ball.radius;
+                isOnGround = true;
+            } else {
+                isOnGround = false;
+            }
+        }
+
+        function gameLoop() {
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i=0; i< balls.length; i++){
+                applyGravity(balls[i]);
+                checkCollision(balls[i]);
+                drawBall(balls[i]);
+            }
+            requestAnimationFrame(gameLoop); 
+        }
+        gameLoop();
+    </script>
+</body>
+</html>

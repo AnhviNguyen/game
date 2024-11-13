@@ -6,6 +6,65 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <canvas id="gameCanvas" width="600" height="400" style="border:1px solid lightgray"></canvas>
+
+    <script> 
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+        // Gravity acceleration (in pixels per frame squared)
+        const gravity = 0.5;
+
+        // Object properties
+        let ball = {
+            position: { x: 300, y: 50 }, // Starting near the top
+            velocity: { x: 0, y: 0 },     // Initial velocity
+            radius: 20,                   // Size of the ball
+            color: "blue"
+        };
+
+        function drawBall(ball) {
+            context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            context.beginPath();
+            context.arc(ball.position.x, ball.position.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = ball.color;
+            context.fill();
+            context.closePath();
+        }
+
+
+        function applyGravity(ball) {
+            // Apply gravity to the velocity
+            // dựa vào công thức v= v0 + at (trong đó t là thời gian thay đổi của mỗi khung hình => nó không thay đổi nên bỏ qua)
+            ball.velocity.y += gravity;
+
+            // Update position by the velocity
+            // dựa theo công thức x = x0+ vt để update vị trí của quả bóng
+            ball.position.y += ball.velocity.y;
+        }
+
+        function checkCollision(ball) {
+            // Check if ball hits the bottom of the canvas
+            if (ball.position.y + ball.radius > canvas.height) {
+                // Reverse the velocity to simulate a bounce
+
+                // velocity.y > 0 => bóng đang di chuyển xuống dưới theo trục y
+                // velocity.y < 0 =>  chỉ rằng bóng đang di chuyển lên trên theo trục y
+                // nhân cho 0.7 để giảm bớt năng lươngj cho quả bóng 
+                ball.velocity.y *= -0.7; 
+                ball.position.y = canvas.height - ball.radius; // Keep the ball above the floor
+            }
+        }
+
+        function gameLoop() {
+            applyGravity(ball);
+            checkCollision(ball);
+            drawBall(ball);
+
+            requestAnimationFrame(gameLoop); // Continue the loop
+        }
+
+        gameLoop(); // Start the animation
+        </script>
 </body>
 </html>
