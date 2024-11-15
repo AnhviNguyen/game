@@ -50,7 +50,7 @@
 
                 // velocity.y > 0 => bóng đang di chuyển xuống dưới theo trục y
                 // velocity.y < 0 =>  chỉ rằng bóng đang di chuyển lên trên theo trục y
-                // nhân cho 0.7 để giảm bớt năng lươngj cho quả bóng 
+                // nhân cho 0.7 để giảm bớt năng lượng cho quả bóng => vận tốc giảm dần theo t
                 ball.velocity.y *= -0.7; 
                 ball.position.y = canvas.height - ball.radius; // Keep the ball above the floor
             }
