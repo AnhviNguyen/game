@@ -12,6 +12,9 @@ export default class Circle extends GameObject
         this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         this.context.fillStyle = this.isColliding ? '#ff8080' : '#0099b0';
         this.context.fill();
+        this.context.lineWidth = 2; // Độ dày viền (có thể thay đổi tùy ý)
+        this.context.strokeStyle = '#000000'; // Màu viền (đen trong ví dụ)
+        this.context.stroke(); // Vẽ viền
     }
 
     update(secondsPassed) {

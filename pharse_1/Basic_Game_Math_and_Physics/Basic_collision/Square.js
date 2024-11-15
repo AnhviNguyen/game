@@ -11,6 +11,11 @@ export default class Square extends GameObject
     draw(){
         this.context.fillStyle = this.isColliding?'#ff8080':'#0099b0';
         this.context.fillRect(this.x, this.y, this.width, this.height);
+        this.context.lineWidth = 2; // Độ dày viền (có thể thay đổi tùy ý)
+        this.context.strokeStyle = '#000000'; // Màu viền (đen trong ví dụ)
+    
+        // Vẽ viền của hình chữ nhật
+        this.context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
     update(secondsPassed){
