@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Collisions</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="400" style="border:1px solid lightgray"></canvas>
+
+    <script type="module">
+        import Circle from "./Circle.js";  // Import Circle class
+
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        let gameObjects;
+        let oldTimeStamp = 0;
+        let secondsPassed;
+
+        function createWorld() {
+            gameObjects = [
+                new Circle(context, 250, 50, 0, 50, 25),
+                new Circle(context, 250, 300, 0, -50, 25),
+                new Circle(context, 150, 0, 50, 50, 20),
+                new Circle(context, 250, 150, 50, 50, 15),
+                new Circle(context, 350, 75, -50, 50, 30),
+                new Circle(context, 300, 300, 50, -50, 25),
+                new Circle(context, 100, 200, -50, -50, 20),
+            ];
+        }
+
+        function circleIntersect(x1, y1, r1, x2, y2, r2) {
+            let squareDistance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+            return squareDistance <= ((r1 + r2) * (r1 + r2));
+        }
+
+        function detectCollisions() {
+            let obj1, obj2;
+
+            // Reset collision state for all objects
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].isColliding = false;
+            }
+
+            // Check for collisions
+            for (let i = 0; i < gameObjects.length; i++) {
+                obj1 = gameObjects[i];
+                for (let j = i + 1; j < gameObjects.length; j++) {
+                    obj2 = gameObjects[j];
+
+                    if (circleIntersect(obj1.x, obj1.y, obj1.radius, obj2.x, obj2.y, obj2.radius)) {
+                        obj1.isColliding = true;
+                        obj2.isColliding = true;
+
+                        // Handle collision response (elastic collision)
+                        let vCollision = { x: obj2.x - obj1.x, y: obj2.y - obj1.y };
+                        let distance = Math.sqrt((obj2.x - obj1.x) * (obj2.x - obj1.x) + (obj2.y - obj1.y) * (obj2.y - obj1.y));
+                        let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+                        let vRelativeVelocity = { x: obj1.vx - obj2.vx, y: obj1.vy - obj2.vy };
+                        let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                        if (speed < 0) {  // If objects are moving apart, do nothing
+                            continue;
+                        }
+
+                        // Impulse calculation
+                        let impulse = 2 * speed / (obj1.radius + obj2.radius);  // Use radius for mass approximation
+                        obj1.vx -= impulse * obj2.radius * vCollisionNorm.x;
+                        obj1.vy -= impulse * obj2.radius * vCollisionNorm.y;
+                        obj2.vx += impulse * obj1.radius * vCollisionNorm.x;
+                        obj2.vy += impulse * obj1.radius * vCollisionNorm.y;
+                    }
+                }
+            }
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function gameLoop(timeStamp) {
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            // Update all game objects
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].update(secondsPassed);
+            }
+
+            detectCollisions();  // Check for collisions between objects
+
+            clearCanvas();
+
+            // Draw all game objects
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].draw();
+            }
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize world and start game loop
+        createWorld();
+        window.requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

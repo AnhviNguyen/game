@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="400" style="border:1px solid lightgray"></canvas>
+
+    <script type="module">
+        import Square from "./Square.js";
+
+
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        let gameObjects;
+        let oldTimeStamp = 0;
+        let secondsPassed;
+
+        function createWorld(){
+            gameObjects = [
+                new Square(context, 250, 50, 0, 50),
+                new Square(context, 250, 300, 0, -50),
+                new Square(context, 150, 0, 50, 50),
+                new Square(context, 250, 150, 50, 50),
+                new Square(context, 350, 75, -50, 50),
+                new Square(context, 300, 300, 50, -50),
+                new Square(context, 100, 200, -50, -50),
+            ];
+        }
+
+        function rectIntersect(x1, y1, width1, height1, x2, y2, width2, height2) {
+            return !(
+                x1 + width1 < x2 || 
+                x2 + width2 < x1 || 
+                y1 + height1 < y2 || 
+                y2 + height2 < y1    
+            );
+        }
+
+        function detectCollisions(){
+            let obj1;
+            let obj2;
+
+            // Reset collision state of all objects
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].isColliding = false;
+            }
+
+            // Start checking for collisions
+            for (let i = 0; i < gameObjects.length; i++)
+            {
+                obj1 = gameObjects[i];
+                for (let j = i + 1; j < gameObjects.length; j++)
+                {
+                    obj2 = gameObjects[j];
+
+                    // Compare object1 with object2
+                    if (rectIntersect(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height)){
+                        obj1.isColliding = true;
+                        obj2.isColliding = true;
+                    }
+                }
+            }
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function gameLoop(timeStamp) {
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].update(secondsPassed);
+            }
+            detectCollisions();
+
+            clearCanvas();
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].draw();
+            }
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        // Tạo thế giới và bắt đầu vòng lặp game
+        createWorld();
+        window.requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

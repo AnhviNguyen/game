@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Collisions</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600" style="border:1px solid lightgray "></canvas>
+
+    <script type="module">
+        import Circle from "./Circle.js"; 
+        import Square from "./Square.js";
+
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        let gameObjects;
+        let oldTimeStamp = 0;
+        let secondsPassed;
+
+        function createWorld() {
+            gameObjects = [
+            new Circle(context, 320, 70, 0, 50, 25),   
+            new Circle(context, 270, 340, 0, -50, 25), 
+            new Circle(context, 140, 15, 60, 40, 20), 
+            new Circle(context, 260, 180, 40, 60, 15), 
+            new Circle(context, 420, 100, -60, 60, 30),
+            new Circle(context, 310, 280, 40, -40, 25),
+            new Circle(context, 110, 220, -40, -60, 20),
+            new Square(context, 260, 80, 10, 60),     
+            new Square(context, 280, 310, 20, -60),    
+            new Square(context, 160, 25, 70, 70),     
+            new Square(context, 280, 170, 40, 60),   
+            new Square(context, 380, 50, -40, 70),    
+            new Square(context, 340, 290, 40, -40),    
+            new Square(context, 130, 190, -40, -60),  
+            
+
+            ];
+        }
+
+        function circleIntersect(x1, y1, r1, x2, y2, r2) {
+            let squareDistance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+            return squareDistance <= ((r1 + r2) * (r1 + r2));
+        }
+
+        function circleRectIntersect(circleX, circleY, radius, rectX, rectY, rectWidth, rectHeight) {
+            let closestX = Math.max(rectX, Math.min(circleX, rectX + rectWidth));
+            let closestY = Math.max(rectY, Math.min(circleY, rectY + rectHeight));
+
+            let distanceX = circleX - closestX;
+            let distanceY = circleY - closestY;
+            let distanceSquared = distanceX * distanceX + distanceY * distanceY;
+
+            return distanceSquared < radius * radius;
+        }
+
+        function detectCollisions() {
+            let obj1, obj2;
+
+            // Reset collision state for all objects
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].isColliding = false;
+            }
+
+            // Check for collisions
+            for (let i = 0; i < gameObjects.length; i++) {
+                obj1 = gameObjects[i];
+                for (let j = i + 1; j < gameObjects.length; j++) {
+                    obj2 = gameObjects[j];
+
+                    if (obj1 instanceof Circle && obj2 instanceof Circle) {
+                        if (circleIntersect(obj1.x, obj1.y, obj1.radius, obj2.x, obj2.y, obj2.radius)) {
+                            obj1.isColliding = true;
+                            obj2.isColliding = true;
+
+                            // Handle elastic collision (for Circle-Circle)
+                            let vCollision = { x: obj2.x - obj1.x, y: obj2.y - obj1.y };
+                            let distance = Math.sqrt((obj2.x - obj1.x) * (obj2.x - obj1.x) + (obj2.y - obj1.y) * (obj2.y - obj1.y));
+                            let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+                            let vRelativeVelocity = { x: obj1.vx - obj2.vx, y: obj1.vy - obj2.vy };
+                            let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                            if (speed < 0) {
+                                continue;
+                            }
+
+                            let impulse = 2 * speed / (obj1.radius + obj2.radius); // Use radius for mass approximation
+                            obj1.vx -= impulse * obj2.radius * vCollisionNorm.x;
+                            obj1.vy -= impulse * obj2.radius * vCollisionNorm.y;
+                            obj2.vx += impulse * obj1.radius * vCollisionNorm.x;
+                            obj2.vy += impulse * obj1.radius * vCollisionNorm.y;
+                        }
+                    } else if (obj1 instanceof Square && obj2 instanceof Square) {
+                        if (rectIntersect(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height)){
+                            obj1.isColliding = true;
+                            obj2.isColliding = true;
+
+                            let vCollision = { x: obj2.x - obj1.x, y: obj2.y - obj1.y };
+                            let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
+                            let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+
+                            let vRelativeVelocity = { x: obj1.vx - obj2.vx, y: obj1.vy - obj2.vy };
+                            let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                            if (speed < 0) {
+                                continue;
+                            }
+
+                            let impulse = 2 * speed / (obj1.width + obj2.width); 
+                            obj1.vx -= impulse * obj2.width * vCollisionNorm.x;
+                            obj1.vy -= impulse * obj2.width * vCollisionNorm.y;
+                            obj2.vx += impulse * obj1.width * vCollisionNorm.x;
+                            obj2.vy += impulse * obj1.width * vCollisionNorm.y;
+                        }   
+                    } else if (obj1 instanceof Circle && obj2 instanceof Square) {
+                        if (circleRectIntersect(obj1.x, obj1.y, obj1.radius, obj2.x, obj2.y, obj2.width, obj2.height)) {
+                            obj1.isColliding = true;
+                            obj2.isColliding = true;
+
+                            let vCollision = { x: obj2.x - obj1.x, y: obj2.y - obj1.y };
+                            let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
+                            let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+
+                            let vRelativeVelocity = { x: obj1.vx - obj2.vx, y: obj1.vy - obj2.vy };
+                            let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                            if (speed < 0) {
+                                continue;
+                            }
+
+                            let impulse = 2 * speed / (obj1.radius + obj2.width); // Use radius and width for mass approximation
+                            obj1.vx -= impulse * obj2.width * vCollisionNorm.x;
+                            obj1.vy -= impulse * obj2.width * vCollisionNorm.y;
+                            obj2.vx += impulse * obj1.radius * vCollisionNorm.x;
+                            obj2.vy += impulse * obj1.radius * vCollisionNorm.y;
+                        }
+
+                    }
+                    
+                }
+            }
+        }
+
+
+        function rectIntersect(x1, y1, width1, height1, x2, y2, width2, height2) {
+            return !(
+                x1 + width1 < x2 || 
+                x2 + width2 < x1 || 
+                y1 + height1 < y2 || 
+                y2 + height2 < y1    
+            );
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function gameLoop(timeStamp) {
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].update(secondsPassed);
+            }
+
+            detectCollisions();  
+
+            clearCanvas();
+
+            for (let i = 0; i < gameObjects.length; i++) {
+                gameObjects[i].draw();
+            }
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        createWorld();
+        window.requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
