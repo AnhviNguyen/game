@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600" style="border:1px solid lightgray "></canvas>
+
+
+    <script  type="module">
+        import Rectangle from "./Rectangle.js"; 
+
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        let oldTimeStamp = 0;
+        let secondsPassed;
+        let rec1 = new Rectangle(context, 260, 80, 180, 200, 5);
+        let rec2 = new Rectangle(context, 160, 25, -150, 100, 5);
+
+        function gameLoop(timeStamp) {
+            secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            rec1.update(secondsPassed);
+            rec2.update(secondsPassed);
+            console.log(rec1);
+            detectCollisions();  
+
+            clearCanvas();
+
+            rec1.draw();
+            rec2.draw();
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        function detectCollisions(){
+            rec1.isColliding = false;
+            rec2.isColliding = false;
+
+            if (rectIntersect(rec1.x, rec1.y, rec1.width, rec1.height, rec2.x, rec2.y, rec2.width, rec2.height)){
+                rec1.isColliding = true;
+                rec2.isColliding = true;
+
+                let vCollision = { x: rec1.x - rec2.x, y: rec1.y - rec2.y };
+                let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
+                let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+
+                let vRelativeVelocity = { x: rec1.vx - rec2.vx, y: rec1.vy - rec2.vy };
+                let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                if (speed < 0) {
+                    let impulse = 2 * speed / (rec1.mass + rec2.mass);
+
+                    rec1.vx -= impulse * rec2.mass * vCollisionNorm.x;
+                    rec1.vy -= impulse * rec2.mass * vCollisionNorm.y;
+                    rec2.vx += impulse * rec1.mass * vCollisionNorm.x;
+                    rec2.vy += impulse * rec1.mass * vCollisionNorm.y;
+                }   
+            }
+        }
+
+        function rectIntersect(x1, y1, width1, height1, x2, y2, width2, height2) {
+            return !(
+                x1 + width1 < x2 || 
+                x2 + width2 < x1 || 
+                y1 + height1 < y2 || 
+                y2 + height2 < y1    
+            );
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        window.requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

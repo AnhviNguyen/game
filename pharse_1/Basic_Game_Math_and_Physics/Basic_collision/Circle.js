@@ -5,6 +5,7 @@ export default class Circle extends GameObject
     constructor (context, x, y, vx, vy, radius){
         super(context, x, y, vx, vy);
         this.radius = radius || 25;
+        this.type = "circle"; 
     }
 
     draw(){

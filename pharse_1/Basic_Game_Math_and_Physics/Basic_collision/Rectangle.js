@@ -1,21 +1,20 @@
 import { GameObject } from "./GameObject.js";
 
-export default class Square extends GameObject
+export default class Rectangle extends GameObject
 {
-    constructor (context, x, y, vx, vy){
+    constructor (context, x, y, vx, vy, mass){
         super(context, x, y, vx, vy);
-        this.width = 50;
-        this.height = 50;
-        this.type = "square"; 
+        this.width = 200;
+        this.height = 100;
+        this.mass = 5;
     }
 
     draw(){
         this.context.fillStyle = this.isColliding?'#ff8080':'#0099b0';
         this.context.fillRect(this.x, this.y, this.width, this.height);
-        this.context.lineWidth = 2; // Độ dày viền (có thể thay đổi tùy ý)
-        this.context.strokeStyle = '#000000'; // Màu viền (đen trong ví dụ)
+        this.context.lineWidth = 2; 
+        this.context.strokeStyle = '#000000'; 
     
-        // Vẽ viền của hình chữ nhật
         this.context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
@@ -31,4 +30,3 @@ export default class Square extends GameObject
         }
     }
 }
-
