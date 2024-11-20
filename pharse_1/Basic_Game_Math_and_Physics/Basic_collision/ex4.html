@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="500" style="border:1px solid lightgray "></canvas>
+
+    <script type="module">
+        import Circle from "./Circle.js"; 
+        import Bullet from "./Bullet.js";
+    
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        let oldTimeStamp = 0;
+    
+        // Initialize game objects
+        const c1 = new Circle(ctx, 320, 70, 50, 90, 25);
+        const c2 = new Circle(ctx, 270, 340, 0, -50, 25); 
+        const c3 = new Circle(ctx, 140, 15, 60, 40, 20);
+        const c4 = new Circle(ctx, 260, 180, 40, 60, 15); 
+        const bullet = new Bullet(ctx, 0, 250, 2000, 1000, 10);
+    
+        bullet.prevX = bullet.x; // Initialize prevX and prevY
+        bullet.prevY = bullet.y;
+    
+        function detectCollisions() {
+            const objects = [c1, c2, c3, c4];
+            bullet.isColliding = false;
+
+            for (const obj of objects) {
+                obj.isColliding = false;
+            }
+
+            for (const obj of objects) {
+                    if (bullet.detectCollisionWithCircle(obj)) {
+                        obj.isColliding = true;
+                        bullet.isColliding = true;
+
+                        // Tính toán vector pháp tuyến
+                        const normalX = (bullet.x - obj.x) / obj.radius;
+                        const normalY = (bullet.y - obj.y) / obj.radius;
+
+                        // Tính vector vận tốc ban đầu
+                        const initialVx = bullet.vx;
+                        const initialVy = bullet.vy;
+
+                        // Phản xạ vector vận tốc
+                        const dotProduct = initialVx * normalX + initialVy * normalY;
+                        bullet.vx = initialVx - 2 * dotProduct * normalX;
+                        bullet.vy = initialVy - 2 * dotProduct * normalY;
+
+                        // Di chuyển viên đạn ra khỏi vật thể để tránh bị kẹt
+                        bullet.x = obj.x + normalX * (obj.radius + bullet.radius + 1);
+                        bullet.y = obj.y + normalY * (obj.radius + bullet.radius + 1);
+                    }
+                }
+        }
+    
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    
+        function gameLoop(timeStamp) {
+            const secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+    
+            // Save current position of bullet before updating
+            bullet.prevX = bullet.x;
+            bullet.prevY = bullet.y;
+    
+            // Update game objects
+            c1.update(secondsPassed);
+            c2.update(secondsPassed);
+            c3.update(secondsPassed);
+            c4.update(secondsPassed);
+            bullet.update(secondsPassed);
+    
+            // Detect and handle collisions
+            detectCollisions();
+    
+            // Clear canvas and redraw
+            clearCanvas();
+            c1.draw();
+            c2.draw();
+            c3.draw();
+            c4.draw();
+            bullet.draw();
+    
+            // Request next animation frame
+            window.requestAnimationFrame(gameLoop);
+        }
+    
+        // Start the game loop
+        window.requestAnimationFrame(gameLoop);
+    </script>
+    
+</body>
+</html>
