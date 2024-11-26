@@ -5,67 +5,79 @@ export default class Bullet {
         this.y = y;
         this.vx = vx;
         this.vy = vy;
+        this.speed = Math.sqrt(vx * vx + vy * vy); // Lưu tốc độ ban đầu
         this.radius = radius;
+        this.collisionImpact = 250; // Lực tác động lên circle khi va chạm
     }
 
     update(secondsPassed) {
-        this.prevX = this.x; 
+        this.prevX = this.x;
         this.prevY = this.y;
+        
+        // Duy trì vận tốc không đổi
         this.x += this.vx * secondsPassed;
         this.y += this.vy * secondsPassed;
 
+        // Va chạm với tường
         if (this.x - this.radius < 0 || this.x + this.radius > this.ctx.canvas.width) {
             this.vx = -this.vx;
         }
-    
         if (this.y - this.radius < 0 || this.y + this.radius > this.ctx.canvas.height) {
-            this.vy = -this.vy; 
+            this.vy = -this.vy;
+        }
+
+        // Đảm bảo tốc độ luôn không đổi
+        const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (currentSpeed !== this.speed) {
+            this.vx = (this.vx / currentSpeed) * this.speed;
+            this.vy = (this.vy / currentSpeed) * this.speed;
+        }
+    }
+
+    detectCollisionWithCircle(circle) {
+        const dx = this.x - circle.x;
+        const dy = this.y - circle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= (this.radius + circle.radius);
+    }
+
+    handleCollision(circle) {
+        // Tính vector pháp tuyến
+        const dx = circle.x - this.x;
+        const dy = circle.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const nx = dx / distance;
+        const ny = dy / distance;
+
+        // Đổi hướng bullet (phản xạ)
+        const dotProduct = (this.vx * nx + this.vy * ny);
+        this.vx = this.vx - 2 * dotProduct * nx;
+        this.vy = this.vy - 2 * dotProduct * ny;
+
+        // Chuẩn hóa vận tốc bullet
+        const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        this.vx = (this.vx / currentSpeed) * this.speed;
+        this.vy = (this.vy / currentSpeed) * this.speed;
+
+        // Truyền động lượng cho circle
+        circle.vx += nx * this.collisionImpact;
+        circle.vy += ny * this.collisionImpact;
+
+        // Tránh chồng lấp
+        const overlap = this.radius + circle.radius - distance;
+        if (overlap > 0) {
+            this.x -= overlap * nx * 0.5;
+            this.y -= overlap * ny * 0.5;
+            circle.x += overlap * nx * 0.5;
+            circle.y += overlap * ny * 0.5;
         }
     }
 
     draw() {
         this.ctx.beginPath();
         this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = this.isColliding ? "red" : "black";
         this.ctx.fill();
         this.ctx.closePath();
     }
-
-    detectCollisionWithCircle(circle) {
-        const bulletPath = {
-            startX: this.prevX,
-            startY: this.prevY,
-            endX: this.x,
-            endY: this.y
-        };
-    
-        return this.lineIntersectsCircle(bulletPath, circle);
-    }
-
-    lineIntersectsCircle(line, circle) {
-        const { startX, startY, endX, endY } = line;
-        const { x: cx, y: cy, radius } = circle;
-    
-        // Vector from line start to circle center
-        const lineVecX = endX - startX;
-        const lineVecY = endY - startY;
-        const centerVecX = cx - startX;
-        const centerVecY = cy - startY;
-    
-        // Project circle center onto the line
-        const lineLength = Math.sqrt(lineVecX * lineVecX + lineVecY * lineVecY);
-        const t = ((centerVecX * lineVecX + centerVecY * lineVecY) / (lineLength * lineLength));
-    
-        // Find the closest point on the line to the circle center
-        const closestX = startX + t * lineVecX;
-        const closestY = startY + t * lineVecY;
-    
-        // Calculate distance between closest point and circle center
-        const distanceX = cx - closestX;
-        const distanceY = cy - closestY;
-        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-    
-        // Check if the closest point is within the line segment and collision radius
-        return distance <= radius && t >= 0 && t <= 1;
-    }    
 }
