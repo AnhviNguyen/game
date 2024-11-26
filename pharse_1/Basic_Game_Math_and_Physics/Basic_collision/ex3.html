@@ -18,7 +18,7 @@
         let gameObjects;
         let oldTimeStamp = 0;
         let secondsPassed;
-        const GRID_SIZE = 100;
+        const GRID_SIZE = 30;
         let grid = new Map();
 
         function updateGrid() {
@@ -58,21 +58,25 @@
         }
 
         function drawGrid() {
-            ctx.strokeStyle = "gray"; 
             ctx.lineWidth = 1;
 
             for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
+                for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+                    const cellX = Math.floor(x / GRID_SIZE);
+                    const cellY = Math.floor(y / GRID_SIZE);
+                    const cellKey = `${cellX},${cellY}`;
 
-            for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
+                    // Kiểm tra nếu ô này có vật thể
+                    if (grid.has(cellKey) && grid.get(cellKey).length > 0) {
+                        // Tô màu ô có vật thể
+                        ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+                        ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
+                    }
+
+                    // Vẽ đường viền ô
+                    ctx.strokeStyle = "gray";
+                    ctx.strokeRect(x, y, GRID_SIZE, GRID_SIZE);
+                }
             }
         }
 
