@@ -42,10 +42,13 @@
 
         function drawRotatedRectangle(rect) {
             context.save(); 
-            context.translate(rect.x, rect.y);
-            context.rotate(rect.rotation);
-            context.fillStyle = "green";
-            context.fillRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height);
+            context.translate(rect.x + rect.width / 2, rect.y + rect.height / 2); 
+            context.rotate(rect.rotation); 
+            context.fillStyle = "green"; 
+            context.lineWidth = 2; 
+            context.strokeStyle = '#000000'; 
+            context.strokeRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height);
+            context.fillRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height); 
             context.restore(); 
         }
 
@@ -59,7 +62,7 @@
             
 
             for (let i = 0; i < gameObjects.length; i++) {
-                updateRotation(gameObjects[i], 0.05); 
+                updateRotation(gameObjects[i], gameObjects[i].rotationSpeed); 
                 drawRotatedRectangle(gameObjects[i]);
             }
            
