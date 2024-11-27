@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1100" height="500" style="border:1px solid lightgray "></canvas>
+
+    <script type="module">
+        import  Rectangle from "../Basic_collision/Rectangle.js"; 
+        
+         var canvas = document.getElementById("gameCanvas");
+         var context = canvas.getContext("2d");
+         let gameObjects;
+
+         function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+         function createWorld() {
+            gameObjects = [];
+
+            for (let i = 0; i < 10; i++) {
+                const size = 30; 
+                const x = random(0, canvas.width - size);
+                const y = random(0, canvas.height - size);
+                const vx = random(-100, 100);
+                const vy = random(-100, 100);
+                const rotation = random(0, Math.PI * 2);
+                const rotationSpeed = random(-0.1, 0.1);
+                const width = random(50, 150); 
+                const height = random(30, 100); 
+                const rotationDirection = Math.random() < 0.5 ? 1 : -1;
+                
+                const rect = new Rectangle(context, x, y, vx, vy, 1, rotation, rotationSpeed * rotationDirection, width, height);
+                gameObjects.push(rect);
+            }
+        }
+
+
+        function drawRotatedRectangle(rect) {
+            context.save(); 
+            context.translate(rect.x, rect.y);
+            context.rotate(rect.rotation);
+            context.fillStyle = "green";
+            context.fillRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height);
+            context.restore(); 
+        }
+
+        function updateRotation(rect, speed) {
+            rect.rotation += speed; 
+        }
+
+        function gameLoop() {
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+
+            
+
+            for (let i = 0; i < gameObjects.length; i++) {
+                updateRotation(gameObjects[i], 0.05); 
+                drawRotatedRectangle(gameObjects[i]);
+            }
+           
+            requestAnimationFrame(gameLoop); 
+        }
+
+        createWorld();
+        gameLoop();
+    </script>
+</body>
+</html>

@@ -2,11 +2,13 @@ import { GameObject } from "./GameObject.js";
 
 export default class Rectangle extends GameObject
 {
-    constructor (context, x, y, vx, vy, mass){
+    constructor (context, x, y, vx, vy, mass, rotation, rotationSpeed, width, height){
         super(context, x, y, vx, vy);
-        this.width = 200;
-        this.height = 100;
+        this.width = width;
+        this.height = height;
         this.mass = 5;
+        this.rotation = rotation;
+        this.rotationSpeed= rotationSpeed
     }
 
     draw(){
