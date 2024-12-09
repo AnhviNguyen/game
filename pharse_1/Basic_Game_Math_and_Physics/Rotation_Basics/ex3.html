@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1100" height="500" style="border:1px solid lightgray "></canvas>
+
+    <script type="module">
+        import  Rectangle from "../Basic_collision/Rectangle.js"; 
+        
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+    
+        const rect = new Rectangle(
+            context,
+            300, 200,  
+            0, 0,       
+            1,          
+            0,          
+            0,         
+            150, 80     
+        );
+
+       
+        let mouseX = 0;
+        let mouseY = 0;
+
+       
+        canvas.addEventListener("mousemove", (event) => {
+            const rectBounds = canvas.getBoundingClientRect(); 
+            mouseX = event.clientX - rectBounds.left; 
+            mouseY = event.clientY - rectBounds.top;
+        });
+
+      
+        function drawRotatedRectangle(rect) {
+            context.save(); 
+            context.translate(rect.x + rect.width / 2, rect.y + rect.height / 2); 
+            context.rotate(rect.rotation); 
+            context.fillStyle = "blue";
+            context.strokeStyle = "black";
+            context.lineWidth = 2;
+
+            
+            context.strokeRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height);
+            context.fillRect(-rect.width / 2, -rect.height / 2, rect.width, rect.height);
+
+            context.restore(); 
+        }
+
+        function calculateRotation(rect, mouseX, mouseY) {
+            const centerX = rect.x + rect.width / 2; 
+            const centerY = rect.y + rect.height / 2; 
+            const angle = Math.atan2(mouseY - centerY, mouseX - centerX); 
+            return angle;
+        }
+
+      
+        function gameLoop() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            rect.rotation = calculateRotation(rect, mouseX, mouseY); 
+            drawRotatedRectangle(rect); 
+            requestAnimationFrame(gameLoop); 
+        }
+
+        gameLoop(); 
+    </script>
+</body>
+</html>

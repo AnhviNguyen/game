@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1100" height="500" style="border:1px solid lightgray "></canvas>
+
+    <script type="module">
+        import  Rectangle from "../Basic_collision/Rectangle.js"; 
+        
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+       
+        const rect = new Rectangle(
+            context,
+            200, 150,  
+            0, 0,      
+            1,         
+            0,        
+            0.05,      
+            200, 100   
+        );
+
+        
+        const pivotX = 340;
+        const pivotY = 250;
+
+       
+        function drawRotatedRectangle(rect, pivotX, pivotY) {
+            context.save(); 
+            context.translate(pivotX, pivotY);
+            context.rotate(rect.rotation); 
+            context.translate(-pivotX, -pivotY); 
+            context.fillStyle = "green";
+            context.strokeStyle = "black";
+            context.lineWidth = 2;
+
+           
+            context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            context.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+            context.restore(); 
+        }
+
+        
+        function updateRotation(rect) {
+            rect.rotation += rect.rotationSpeed; 
+        }
+
+        
+        function gameLoop() {
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            updateRotation(rect); 
+            drawRotatedRectangle(rect, pivotX, pivotY); 
+            requestAnimationFrame(gameLoop); 
+        }
+
+        gameLoop(); 
+    </script>
+</body>
+</html>
