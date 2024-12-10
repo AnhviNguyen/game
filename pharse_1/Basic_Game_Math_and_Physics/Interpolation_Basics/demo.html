@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="400" style="border:1px solid lightgray "> </canvas>
+
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+        let lastTime = 0;
+
+        let circle = {
+            position: { x: 50, y: 200 },
+            radius: 20,
+            color: "blue"
+        };
+
+        let animation = {
+            start: { x: 50, y: 200 },
+            end: { x: 500, y: 200 },
+            duration: 2000, // in milliseconds
+            startTime: null
+        };
+
+        function easeOutQuad(t) {
+            return t * (2 - t); // Quadratic easing
+        }
+
+        function lerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+
+        function animateCircle(time) {
+            // if (!animation.startTime) animation.startTime = time;
+            // const elapsed = time - animation.startTime;
+
+
+            // let t = Math.min(elapsed / animation.duration, 1);
+            // t = easeOutQuad(t); 
+
+
+            // circle.position.x = lerp(animation.start.x, animation.end.x, t);
+            // circle.position.y = lerp(animation.start.y, animation.end.y, t);
+
+            // context.clearRect(0, 0, canvas.width, canvas.height);
+            // drawCircle(circle);
+
+
+            // if (t < 1) requestAnimationFrame(animateCircle);
+
+            if (!animation.startTime) animation.startTime = time;
+
+            const deltaTime = time - lastTime;
+            lastTime = time;
+
+            const elapsed = time - animation.startTime;
+            let t = Math.min(elapsed / animation.duration, 1);
+            t = easeOutQuad(t);
+
+            circle.position.x = lerp(animation.start.x, animation.end.x, t);
+            circle.position.y = lerp(animation.start.y, animation.end.y, t);
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawCircle(circle);
+
+            if (t < 1) requestAnimationFrame(animateCircle);
+        }
+
+        function drawCircle({ position, radius, color }) {
+            context.beginPath();
+            context.arc(position.x, position.y, radius, 0, Math.PI * 2);
+            context.fillStyle = color;
+            context.fill();
+        }
+
+        requestAnimationFrame(animateCircle);
+
+
+    </script>
+
+
+</body>
+</html>

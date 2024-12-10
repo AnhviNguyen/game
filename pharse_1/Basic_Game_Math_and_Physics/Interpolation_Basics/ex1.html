@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ease-In-Out Animation</title>
+    <style>
+        canvas {
+            border: 1px solid lightgray;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+    <script>
+        // Get canvas and context
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+        // Circle object properties
+        let circle = {
+            position: { x: 50, y: 200 },
+            radius: 20,
+            color: "blue"
+        };
+
+        // Animation properties
+        let animation = {
+            start: { x: 50, y: 200 },
+            end: { x: 500, y: 200 },
+            duration: 3000, // Total duration in milliseconds
+            startTime: null
+        };
+
+        // Ease-In-Out Function
+        function easeInOutQuad(t) {
+            return t < 0.5
+                ? 2 * t * t // Ease-in for the first half
+                : 1 - Math.pow(-2 * t + 2, 2) / 2; // Ease-out for the second half
+        }
+
+        // Linear Interpolation Function
+        function lerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+
+        // Draw Circle
+        function drawCircle({ position, radius, color }) {
+            context.beginPath();
+            context.arc(position.x, position.y, radius, 0, Math.PI * 2);
+            context.fillStyle = color;
+            context.fill();
+        }
+
+        // Animate Circle
+        function animateCircle(time) {
+            if (!animation.startTime) animation.startTime = time;
+            const elapsed = time - animation.startTime;
+
+            // Calculate `t` as the fraction of elapsed time
+            let t = Math.min(elapsed / animation.duration, 1);
+
+            // Apply Ease-In-Out function to `t`
+            t = easeInOutQuad(t);
+
+            // Interpolate circle's position
+            circle.position.x = lerp(animation.start.x, animation.end.x, t);
+            circle.position.y = lerp(animation.start.y, animation.end.y, t);
+
+            // Clear canvas and draw circle
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawCircle(circle);
+
+            // Continue animation until complete
+            if (t < 1) requestAnimationFrame(animateCircle);
+        }
+
+        // Start Animation
+        requestAnimationFrame(animateCircle);
+    </script>
+</body>
+</html>

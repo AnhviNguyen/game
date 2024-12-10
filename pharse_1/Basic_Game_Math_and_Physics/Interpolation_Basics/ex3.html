@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Path Animation</title>
+    <style>
+        canvas {
+            border: 1px solid lightgray;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const context = canvas.getContext("2d");
+
+        // Circle path properties
+        const path = {
+            centerX: canvas.width / 2, // Center X of the circular path
+            centerY: canvas.height / 2, // Center Y of the circular path
+            radius: 150               // Radius of the circular path
+        };
+
+        // Animation properties
+        const animation = {
+            duration: 4000,  // Total duration of the animation (milliseconds)
+            startTime: null, // Animation start time
+        };
+
+        // Object (ball) properties
+        const ball = {
+            radius: 20,   // Ball radius
+            color: "red", // Ball color
+            angle: 0      // Current angle on the path (in radians)
+        };
+
+        // Ease-In-Out Function for Smooth Motion
+        function easeInOutQuad(t) {
+            return t < 0.5
+                ? 2 * t * t // Accelerate in the first half
+                : 1 - Math.pow(-2 * t + 2, 2) / 2; // Decelerate in the second half
+        }
+
+        // Draw Ball
+        function drawBall(x, y, radius, color) {
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2);
+            context.fillStyle = color;
+            context.fill();
+        }
+
+        // Animate Ball Along Circular Path
+        function animateBall(time) {
+            if (!animation.startTime) animation.startTime = time; // Set the animation start time
+            const elapsed = time - animation.startTime;           // Time elapsed since animation started
+            let t = Math.min(elapsed / animation.duration, 1);    // Normalize time to 0-1 range
+
+            // Apply easing to the time factor
+            t = easeInOutQuad(t);
+
+            // Update the angle based on the eased time factor
+            ball.angle = t * Math.PI * 2; // Full circle (360° = 2π radians)
+
+            // Calculate the ball's position on the circular path
+            const x = path.centerX + path.radius * Math.cos(ball.angle);
+            const y = path.centerY + path.radius * Math.sin(ball.angle);
+
+            // Clear canvas and draw the ball
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall(x, y, ball.radius, ball.color);
+
+            // Continue animation if not complete
+            if (t < 1) requestAnimationFrame(animateBall);
+        }
+
+        // Start the animation
+        requestAnimationFrame(animateBall);
+    </script>
+</body>
+</html>
