@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Rotation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const spaceship = new Image();
+        spaceship.src = './img/space_ship.png'; // Replace with the path to your spaceship image
+
+        const spaceshipState = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            angle: 0,
+            speed: 5,
+            scale: 0.2, // Scale factor to adjust spaceship size
+        };
+
+        let mousePos = { x: 0, y: 0 };
+        let keysPressed = {};
+
+        canvas.addEventListener('mousemove', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = event.clientX - rect.left;
+            mousePos.y = event.clientY - rect.top;
+
+            spaceshipState.angle = Math.atan2(
+                mousePos.y - spaceshipState.y,
+                mousePos.x - spaceshipState.x
+            );
+        });
+
+        window.addEventListener('keydown', (event) => {
+            keysPressed[event.key] = true;
+        });
+
+        window.addEventListener('keyup', (event) => {
+            keysPressed[event.key] = false;
+        });
+
+        function handleMovement() {
+            if (keysPressed['ArrowUp']) spaceshipState.y -= spaceshipState.speed;
+            if (keysPressed['ArrowDown']) spaceshipState.y += spaceshipState.speed;
+            if (keysPressed['ArrowLeft']) spaceshipState.x -= spaceshipState.speed;
+            if (keysPressed['ArrowRight']) spaceshipState.x += spaceshipState.speed;
+
+            // Prevent spaceship from moving out of canvas bounds
+            spaceshipState.x = Math.max(0, Math.min(canvas.width, spaceshipState.x));
+            spaceshipState.y = Math.max(0, Math.min(canvas.height, spaceshipState.y));
+        }
+
+        function drawRotatedImage(image, x, y, angle, scale) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.scale(scale, scale); // Apply scaling to the image
+            ctx.drawImage(image, -image.width / 2, -image.height / 2);
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            handleMovement();
+
+            if (spaceship.complete) {
+                drawRotatedImage(
+                    spaceship,
+                    spaceshipState.x,
+                    spaceshipState.y,
+                    spaceshipState.angle,
+                    spaceshipState.scale
+                );
+            }
+
+            // Draw a simple target circle at the mouse position
+            ctx.beginPath();
+            ctx.arc(mousePos.x, mousePos.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        spaceship.onload = gameLoop;
+    </script>
+</body>
+</html>
