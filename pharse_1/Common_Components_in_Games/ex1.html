@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catch the Falling Stars</title>
+    <style>
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 0 auto;
+        }
+        body {
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        class GameManager {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = 800;
+                this.canvas.height = 600;
+                
+                this.score = 0;
+                this.lives = 3;
+                this.isGameOver = false;
+                this.level = 1;
+                this.gameOverSoundPlayed = false; 
+                
+                this.player = new Player(this.canvas.width / 2, this.canvas.height - 50);
+                this.stars = [];
+                this.lastStarTime = 0;
+                this.starInterval = 2000;
+                
+                this.audioManager = new AudioManager();
+                this.keys = {
+                    left: false,
+                    right: false
+                };
+                
+                this.setupEventListeners();
+                this.gameLoop();
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.keys.left = true;
+                    if (e.key === 'ArrowRight') this.keys.right = true;
+                    if (e.key === 'r' && this.isGameOver) this.reset();
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    if (e.key === 'ArrowLeft') this.keys.left = false;
+                    if (e.key === 'ArrowRight') this.keys.right = false;
+                });
+            }
+
+            handlePlayerMovement() {
+                if (this.keys.left) this.player.moveLeft();
+                if (this.keys.right) this.player.moveRight();
+                // Apply friction when no keys are pressed
+                if (!this.keys.left && !this.keys.right) {
+                    this.player.applyFriction();
+                }
+                // Update player position based on velocity
+                this.player.updatePosition(this.canvas.width);
+            }
+
+            spawnStar() {
+                const now = Date.now();
+                if (now - this.lastStarTime > this.starInterval) {
+                    const x = Math.random() * (this.canvas.width - 20);
+                    this.stars.push(new Star(x, 0));
+                    this.lastStarTime = now;
+                    
+                    // Increase difficulty with level
+                    this.starInterval = Math.max(500, 2000 - (this.level - 1) * 200);
+                }
+            }
+
+            checkCollisions() {
+                for (let i = this.stars.length - 1; i >= 0; i--) {
+                    const star = this.stars[i];
+                    
+                    // Check if star is caught
+                    if (this.player.collidesWith(star)) {
+                        this.stars.splice(i, 1);
+                        this.score += 10;
+                        this.audioManager.playSound('catch');
+                        
+                        // Level up every 100 points
+                        this.level = Math.floor(this.score / 100) + 1;
+                    }
+                    
+                    // Check if star is missed
+                    if (star.y > this.canvas.height) {
+                        this.stars.splice(i, 1);
+                        this.lives--;
+                        if (this.lives <= 0) {
+                            this.isGameOver = true;
+                        }
+                    }
+
+                    if (this.lives <= 0) {
+                        this.isGameOver = true;
+                        if (!this.gameOverSoundPlayed) {
+                            this.audioManager.playSound('gameOver');
+                            this.gameOverSoundPlayed = true;
+                        }
+                    }
+                }
+            }
+
+            update() {
+                if (!this.isGameOver) {
+                    this.handlePlayerMovement();
+                    this.spawnStar();
+                    this.stars.forEach(star => star.update());
+                    this.checkCollisions();
+                }
+            }
+
+            draw() {
+                this.ctx.fillStyle = '#000033';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.player.draw(this.ctx);
+                this.stars.forEach(star => star.draw(this.ctx));
+                
+                // Draw HUD
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = '24px Arial';
+                this.ctx.fillText(`Score: ${this.score}`, 10, 30);
+                this.ctx.fillText(`Lives: ${this.lives}`, 10, 60);
+                this.ctx.fillText(`Level: ${this.level}`, 10, 90);
+                
+                if (this.isGameOver) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.font = '48px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('Game Over!', this.canvas.width/2, this.canvas.height/2);
+                    this.ctx.font = '24px Arial';
+                    this.ctx.fillText('Press R to restart', this.canvas.width/2, this.canvas.height/2 + 50);
+                    this.ctx.textAlign = 'left';
+                }
+            }
+
+            gameLoop() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+
+            reset() {
+                this.score = 0;
+                this.lives = 3;
+                this.isGameOver = false;
+                this.level = 1;
+                this.stars = [];
+                this.lastStarTime = 0;
+                this.starInterval = 2000;
+                this.player.x = this.canvas.width / 2;
+                this.player.velocity = 0;
+                this.gameOverSoundPlayed = false;
+            }
+        }
+
+        class Player {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 100;
+                this.height = 60;
+                this.velocity = 0;
+                this.acceleration = 0.8;
+                this.maxSpeed = 5;
+                this.friction = 0.92;
+            }
+
+            moveLeft() {
+                this.velocity = Math.max(this.velocity - this.acceleration, -this.maxSpeed);
+            }
+
+            moveRight() {
+                this.velocity = Math.min(this.velocity + this.acceleration, this.maxSpeed);
+            }
+
+            applyFriction() {
+                this.velocity *= this.friction;
+                if (Math.abs(this.velocity) < 0.1) this.velocity = 0;
+            }
+
+            updatePosition(canvasWidth) {
+                this.x += this.velocity;
+                // Keep player within bounds
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.velocity = 0;
+                } else if (this.x + this.width > canvasWidth) {
+                    this.x = canvasWidth - this.width;
+                    this.velocity = 0;
+                }
+            }
+
+            collidesWith(star) {
+                return this.x < star.x + star.size &&
+                       this.x + this.width > star.x &&
+                       this.y < star.y + star.size &&
+                       this.y + this.height > star.y;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = '#4488ff';
+                // Draw basket shape
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.height);
+                ctx.lineTo(this.x + this.width, this.y + this.height);
+                ctx.lineTo(this.x + this.width - 10, this.y + this.height - 20);
+                ctx.lineTo(this.x + 10, this.y + this.height - 20);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        class Star {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 20;
+                this.speed = 3;
+            }
+
+            update() {
+                this.y += this.speed;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = '#ffff00';
+                // Draw star shape
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    ctx.lineTo(
+                        this.x + this.size/2 * Math.cos(i * 4 * Math.PI / 5 - Math.PI/2),
+                        this.y + this.size/2 * Math.sin(i * 4 * Math.PI / 5 - Math.PI/2)
+                    );
+                    ctx.lineTo(
+                        this.x + this.size/4 * Math.cos((i * 4 + 2) * Math.PI / 5 - Math.PI/2),
+                        this.y + this.size/4 * Math.sin((i * 4 + 2) * Math.PI / 5 - Math.PI/2)
+                    );
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        class AudioManager {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.setupSounds();
+            }
+
+            setupSounds() {
+                this.sounds = {};
+                
+                // Âm thanh bắt sao
+                this.sounds.catch = () => {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(440, this.audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                    
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.1);
+                };
+
+                // Âm thanh game over
+                this.sounds.gameOver = () => {
+                    // Tạo các oscillator cho âm thanh phức tạp
+                    const oscillators = [];
+                    const gainNodes = [];
+                    
+                    // Tạo 3 nốt giảm dần để tạo hiệu ứng "thua"
+                    const frequencies = [440, 350, 280]; // Các tần số cho các nốt
+                    const startTimes = [0, 0.2, 0.4];   // Thời điểm bắt đầu mỗi nốt
+                    const durations = [0.3, 0.3, 0.5];  // Độ dài mỗi nốt
+                    
+                    frequencies.forEach((freq, index) => {
+                        const osc = this.audioContext.createOscillator();
+                        const gain = this.audioContext.createGain();
+                        
+                        osc.connect(gain);
+                        gain.connect(this.audioContext.destination);
+                        
+                        osc.type = 'square'; // Dùng sóng vuông cho âm thanh game over
+                        osc.frequency.setValueAtTime(freq, this.audioContext.currentTime + startTimes[index]);
+                        
+                        // Điều chỉnh âm lượng
+                        gain.gain.setValueAtTime(0.2, this.audioContext.currentTime + startTimes[index]);
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + startTimes[index] + durations[index]);
+                        
+                        osc.start(this.audioContext.currentTime + startTimes[index]);
+                        osc.stop(this.audioContext.currentTime + startTimes[index] + durations[index]);
+                        
+                        oscillators.push(osc);
+                        gainNodes.push(gain);
+                    });
+                };
+            }
+
+            playSound(name) {
+                if (this.sounds[name]) {
+                    // Đảm bảo audioContext đang chạy (cần thiết cho một số trình duyệt)
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+                    this.sounds[name]();
+                }
+            }
+        }
+
+        // Start the game
+        new GameManager();
+    </script>
+</body>
+</html>
