@@ -7,8 +7,8 @@ let levelTransitionStartTime = 0;
 const levelTransitionDuration = 5000; // 3 seconds
 
 
-canvas.width = 800;
-canvas.height = 800;
+canvas.width = 1200;
+canvas.height = 600;
 
 // Load images
 const bird = new Image();
