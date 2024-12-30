@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 
 let isLevelTransition = false;
 let levelTransitionStartTime = 0;
-const levelTransitionDuration = 5000; // 3 seconds
+const levelTransitionDuration = 2000; 
 
 
 canvas.width = 1200;
@@ -32,38 +32,38 @@ const swooshSound = new Audio('audio/sfx_swooshing.wav');
 // Level configurations
 const levelConfig = {
     1: {
-        pipeSpeed: 1.5, // Decreased from 2
-        pipeInterval: 2500, // Increased from 2000
-        gravity: 0.2, // Decreased from 0.25
-        pipeGap: 280, // Increased from 250
+        pipeSpeed: 1.5, 
+        pipeInterval: 2500, 
+        gravity: 0.2, 
+        pipeGap: 280, 
         requiredScore: 5
     },
     2: {
         pipeSpeed: 2,
-        pipeInterval: 2000,
+        pipeInterval:2000,
         gravity: 0.25,
         pipeGap: 250,
         requiredScore: 10
     },
     3: {
         pipeSpeed: 2.5,
-        pipeInterval: 1800,
+        pipeInterval: 1500,
         gravity: 0.28,
-        pipeGap: 230,
+        pipeGap: 220,
         requiredScore: 15
     },
     4: {
         pipeSpeed: 3,
-        pipeInterval: 1600,
+        pipeInterval: 1000,
         gravity: 0.3,
-        pipeGap: 220,
+        pipeGap: 180,
         requiredScore: 20
     },
     5: {
         pipeSpeed: 3.5,
-        pipeInterval: 1400,
+        pipeInterval: 500,
         gravity: 0.32,
-        pipeGap: 210,
+        pipeGap: 140,
         requiredScore: 25
     }
 };
@@ -83,7 +83,7 @@ let highScore = 0;
 // Level up animation variables
 let showLevelUp = false;
 let levelUpTimer = 0;
-const levelUpDuration = 2000; // 2 seconds
+const levelUpDuration = 1000; // 2 seconds
 let levelUpStartTime = 0;
 
 // Get current level configuration
@@ -119,11 +119,16 @@ document.addEventListener('click', () => {
     }
 });
 
-function resetGame() {
+function resetLevelState() {
     birdY = canvas.height / 2;
     velocity = 0;
     pipes = [];
     score = 0;
+    lastPipe = 0;
+}
+
+function resetGame() {
+    resetLevelState();
     currentLevel = 1;
     gameOver = false;
     showLevelUp = false;
@@ -151,14 +156,13 @@ function checkLevelUp(timestamp) {
             currentLevel++;
             showLevelUp = true;
             levelUpStartTime = timestamp;
-            levelTransitionStartTime = timestamp; // Bắt đầu trạng thái chuyển cấp
+            levelTransitionStartTime = timestamp;
             isLevelTransition = true;
             swooshSound.play();
+            resetLevelState(); // Reset state khi lên level
         }
     }
 }
-
-
 
 
 function drawLevelUpMessage(timestamp) {
