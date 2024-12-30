@@ -7,7 +7,7 @@ let levelTransitionStartTime = 0;
 const levelTransitionDuration = 5000; // 3 seconds
 
 
-canvas.width = 1500;
+canvas.width = 800;
 canvas.height = 800;
 
 // Load images
