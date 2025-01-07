@@ -17,7 +17,7 @@ const bottomPipe = new Image();
 const topPipe = new Image();
 
 bird.src = 'img/flappybird.png';
-bg.src = 'img/flappybirdbg.png';
+bg.src = 'img/background1.jpg';
 bottomPipe.src = 'img/bottompipe.png';
 topPipe.src = 'img/toppipe.png';
 
@@ -33,38 +33,43 @@ const swooshSound = new Audio('audio/sfx_swooshing.wav');
 const levelConfig = {
     1: {
         pipeSpeed: 1.5, 
-        pipeInterval: 2500, 
+        pipeInterval: 2400, 
         gravity: 0.2, 
-        pipeGap: 280, 
-        requiredScore: 5
+        pipeGap: 240, 
+        requiredScore: 5,
+        pipeOscillation: 0,
     },
     2: {
         pipeSpeed: 2,
         pipeInterval:2000,
         gravity: 0.25,
-        pipeGap: 250,
-        requiredScore: 10
+        pipeGap: 200,
+        requiredScore: 10,
+        pipeOscillation: 0,
     },
     3: {
         pipeSpeed: 2.5,
-        pipeInterval: 1500,
+        pipeInterval: 1600,
         gravity: 0.28,
-        pipeGap: 220,
-        requiredScore: 15
+        pipeGap: 160,
+        requiredScore: 15,
+        pipeOscillation: 1,
     },
     4: {
         pipeSpeed: 3,
-        pipeInterval: 1000,
+        pipeInterval: 1200,
         gravity: 0.3,
-        pipeGap: 180,
-        requiredScore: 20
+        pipeGap: 120,
+        requiredScore: 20,
+        pipeOscillation: 1.5,
     },
     5: {
         pipeSpeed: 3.5,
-        pipeInterval: 500,
+        pipeInterval: 800,
         gravity: 0.32,
-        pipeGap: 140,
-        requiredScore: 25
+        pipeGap: 100,
+        requiredScore: 25,
+        pipeOscillation: 2,
     }
 };
 
@@ -82,8 +87,7 @@ let highScore = 0;
 
 // Level up animation variables
 let showLevelUp = false;
-let levelUpTimer = 0;
-const levelUpDuration = 1000; // 2 seconds
+const levelUpDuration = 1000; 
 let levelUpStartTime = 0;
 
 // Get current level configuration
@@ -97,6 +101,7 @@ for (let i = 0; i < 4; i++) {
     img.src = `img/flappybird${i}.png`;
     birdSprites.push(img);
 }
+
 let currentFrame = 0;
 let frameCount = 0;
 
@@ -130,6 +135,7 @@ function resetLevelState() {
 function resetGame() {
     resetLevelState();
     currentLevel = 1;
+    bg.src = 'img/background1.jpg';
     gameOver = false;
     showLevelUp = false;
     bgMusic.currentTime = 0;
@@ -145,7 +151,24 @@ function createPipe() {
     pipes.push({
         x: canvas.width,
         topHeight: height,
-        passed: false
+        passed: false,
+        initialHeight: height,
+        oscillationOffset: Math.random() * Math.PI * 2
+    });
+}
+
+function updatePipes(timestamp) {
+    const config = getCurrentConfig();
+    pipes.forEach(pipe => {
+        if (!gameOver && !showLevelUp) {
+            pipe.x -= config.pipeSpeed;
+            // Thêm chuyển động lên xuống từ level 3
+            if (currentLevel >= 3) {
+                pipe.topHeight = pipe.initialHeight + 
+                    Math.sin(timestamp * 0.001 + pipe.oscillationOffset) * 
+                    50 * config.pipeOscillation;
+            }
+        }
     });
 }
 
@@ -154,12 +177,13 @@ function checkLevelUp(timestamp) {
         const config = getCurrentConfig();
         if (score >= config.requiredScore && !showLevelUp && !isLevelTransition) {
             currentLevel++;
+            bg.src = `img/background${currentLevel}.jpg`;
             showLevelUp = true;
             levelUpStartTime = timestamp;
             levelTransitionStartTime = timestamp;
             isLevelTransition = true;
             swooshSound.play();
-            resetLevelState(); // Reset state khi lên level
+            resetLevelState();
         }
     }
 }
@@ -260,6 +284,10 @@ function gameLoop(timestamp) {
     
         requestAnimationFrame(gameLoop);
         return; // Không xử lý các logic khác
+    }
+
+    if (!gameOver && !isLevelTransition) {
+        updatePipes(timestamp);
     }
     
     if (!gameOver) {
