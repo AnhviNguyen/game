@@ -12,6 +12,8 @@ canvas.height = 600;
 
 // Load images
 const bird = new Image();
+const enemies = new Image();
+
 const bg = new Image();
 const bottomPipe = new Image();
 const topPipe = new Image();
@@ -20,6 +22,7 @@ bird.src = 'img/flappybird.png';
 bg.src = 'img/background1.jpg';
 bottomPipe.src = 'img/bottompipe.png';
 topPipe.src = 'img/toppipe.png';
+enemies.src = 'img/redbird.png';
 
 // Load audio
 const bgMusic = new Audio('audio/bgm_mario.mp3');
@@ -84,6 +87,7 @@ let pipes = [];
 let lastPipe = 0;
 let currentLevel = 1;
 let highScore = 0;
+enemyBirds = []; 
 
 // Level up animation variables
 let showLevelUp = false;
@@ -138,8 +142,47 @@ function resetGame() {
     bg.src = 'img/background1.jpg';
     gameOver = false;
     showLevelUp = false;
+    enemyBirds = []; // Clear enemy birds
     bgMusic.currentTime = 0;
     bgMusic.play();
+}
+
+function createEnemyBird() {
+    // Spawn từ bên trái canvas với độ cao ngẫu nhiên
+    const yPosition = Math.random() * canvas.height;
+    
+    enemyBirds.push({
+        x: -34,  // Bắt đầu từ ngoài cạnh trái
+        y: yPosition,
+        width: 34,
+        height: 24,
+        speed: 3
+    });
+}
+
+function updateEnemyBirds() {
+    if (!gameOver && !showLevelUp) {
+        enemyBirds.forEach((enemy, index) => {
+            // Di chuyển từ trái sang phải
+            enemy.x += enemy.speed;
+    
+            pipes.forEach(pipe => {
+                if (enemy.x + enemy.width > pipe.x && 
+                    enemy.x < pipe.x + 52) {
+                }
+            });
+
+            // Check collision với player bird
+            if (birdX < enemy.x + 34 && birdX + 34 > enemy.x &&
+                birdY < enemy.y + 24 && birdY + 24 > enemy.y) {
+                hitSound.play();
+                dieSound.play();
+                gameOver = true;
+                bgMusic.pause();
+                highScore = Math.max(highScore, score);
+            }
+        });
+    }
 }
 
 function createPipe() {
@@ -284,7 +327,7 @@ function gameLoop(timestamp) {
     
         requestAnimationFrame(gameLoop);
         return; // Không xử lý các logic khác
-    }
+    } 
 
     if (!gameOver && !isLevelTransition) {
         updatePipes(timestamp);
@@ -294,6 +337,9 @@ function gameLoop(timestamp) {
         // Create new pipes
         if (!lastPipe || timestamp - lastPipe >= config.pipeInterval) {
             createPipe();
+            if (Math.random() < 0.5) { 
+                createEnemyBird();
+            }
             lastPipe = timestamp;
         }
         
@@ -310,6 +356,14 @@ function gameLoop(timestamp) {
         // Check for level up
         checkLevelUp(timestamp);
     }
+
+    updateEnemyBirds();
+    enemyBirds.forEach(enemy => {
+        ctx.save();
+        ctx.translate(enemy.x + 17, enemy.y + 12);
+        ctx.drawImage(enemies, -17, -12, 34, 24);
+        ctx.restore();
+    });
     
     // Draw pipes and check collision
     pipes.forEach((pipe, index) => {
