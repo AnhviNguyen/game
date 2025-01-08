@@ -148,42 +148,42 @@ function resetGame() {
 }
 
 function createEnemyBird() {
-    // Spawn từ bên trái canvas với độ cao ngẫu nhiên
     const yPosition = Math.random() * canvas.height;
     
     enemyBirds.push({
-        x: -34,  // Bắt đầu từ ngoài cạnh trái
+        x: canvas.width + 100,  // Bắt đầu từ ngoài cạnh trái
         y: yPosition,
         width: 34,
         height: 24,
-        speed: 3
+        speed: 5
     });
 }
 
 function updateEnemyBirds() {
     if (!gameOver && !showLevelUp) {
         enemyBirds.forEach((enemy, index) => {
-            // Di chuyển từ trái sang phải
-            enemy.x += enemy.speed;
-    
-            pipes.forEach(pipe => {
-                if (enemy.x + enemy.width > pipe.x && 
-                    enemy.x < pipe.x + 52) {
-                }
-            });
+            // Di chuyển từ phải sang trái
+            enemy.x -= enemy.speed;
 
-            // Check collision với player bird
-            if (birdX < enemy.x + 34 && birdX + 34 > enemy.x &&
-                birdY < enemy.y + 24 && birdY + 24 > enemy.y) {
+            // Check collision với bird của người chơi
+            if (birdX < enemy.x + enemy.width && birdX + 34 > enemy.x &&
+                birdY < enemy.y + enemy.height && birdY + 24 > enemy.y) {
                 hitSound.play();
                 dieSound.play();
                 gameOver = true;
                 bgMusic.pause();
                 highScore = Math.max(highScore, score);
             }
+
+            // Remove off-screen enemies
+            if (enemy.x + enemy.width < 0) {
+                enemyBirds.splice(index, 1);
+            }
         });
     }
 }
+
+
 
 function createPipe() {
     const config = getCurrentConfig();
@@ -337,7 +337,7 @@ function gameLoop(timestamp) {
         // Create new pipes
         if (!lastPipe || timestamp - lastPipe >= config.pipeInterval) {
             createPipe();
-            if (Math.random() < 0.5) { 
+            if (Math.random() < 0.8) { 
                 createEnemyBird();
             }
             lastPipe = timestamp;
