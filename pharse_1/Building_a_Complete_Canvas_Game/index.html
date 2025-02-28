@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Flappy Bird</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
             display: flex;
@@ -10,13 +11,88 @@
             height: 100vh; 
             margin: 0; 
         }
-        canvas {
-            border: 1px solid ;
+        #gameCanvas {
+            display: none; /* Hide the canvas initially */
+            border: 1px solid;
+        }
+        #startScreen {
+            position: absolute;
+            width: 60%;
+            height: 70%;
+            background-image: url('/img/background_begin.png');
+            background-size: 100% 100%;
+            background-position: bottom;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            align-items: start;
+        }
+        .box-button{
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            flex-direction: column;
+            margin-bottom: 20px;
+            margin-left: 50px;
+        }
+        button {
+            margin: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        #optionsPanel {
+            position: absolute;
+            width: 60%;
+            height: 70%;
+            background-image: url('/img/background_begin.png');
+            background-size: 100% 100%;
+            background-position: bottom;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            align-items: start;
+        }
+        .sound-button {
+            margin: 10px;
+            font-size: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <script src="script.js"></script>
+    <div id="startScreen">
+        <div class="box-button">
+            <button id="startButton" class="button-84-pushable" role="button">
+                <span class="button-84-shadow"></span>
+                <span class="button-84-edge"></span>
+                <span class="button-84-front text">
+                Start
+                </span>
+            </button>
+            <button id="optionButton" class="button-83-pushable" role="button">
+                <span class="button-83-shadow"></span>
+                <span class="button-83-edge"></span>
+                <span class="button-83-front text">
+                    Option
+                </span>
+            </button>
+            <button id="exitButton" class="button-82-pushable" role="button">
+                <span class="button-82-shadow"></span>
+                <span class="button-82-edge"></span>
+                <span class="button-82-front text">
+                Exit
+                </span>
+            </button>
+        </div>
+    </div>
+    <div id="optionsPanel">
+        <h2>Options</h2>
+        <p>Score: <span id="scoreDisplay">0</span></p>
+        <button id="muteButton" class="sound-button">Mute</button>
+        <button id="unmuteButton" class="sound-button">Unmute</button>
+        <button id="closeOptionsButton" class="sound-button">Close</button>
+    </div>
+    <canvas id="gameCanvas" width="1200" height="600"></canvas>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
