@@ -3,71 +3,6 @@
 <head>
     <title>Flappy Bird</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            display: flex;
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        #gameCanvas {
-            display: none; /* Hide the canvas initially */
-            border: 1px solid;
-        }
-        #startScreen {
-            position: absolute;
-            width: 60%;
-            height: 70%;
-            background-image: url('img/background_begin.png');
-            background-size: 100% 100%;
-            background-position: bottom;
-            display: flex;
-            flex-direction: column;
-            justify-content: end;
-            align-items: start;
-        }
-        .box-button{
-            display: flex;
-            justify-content: center;
-            align-items: start;
-            flex-direction: column;
-            margin-bottom: 20px;
-            margin-left: 50px;
-        }
-        button {
-            margin: 10px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        #optionsPanel {
-            display: none; /* Hide the options panel initially */
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid white;
-            padding: 8px;
-            text-align: center;
-        }
-        .sound-button {
-            margin: 10px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <div id="startScreen">
@@ -94,24 +29,78 @@
                 </span>
             </button>
         </div>
+        
+        <div class="options-container">
+            <div class="title">OPTIONS</div>
+            <div class="section">
+                <div class="section-title">Sound</div>
+                <div class="sound-option">
+                    <div class="sound-label">Music</div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider pixel"></span>
+                    </label>
+                </div>
+                <div class="sound-option">
+                    <div class="sound-label">SFX</div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider pixel"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="section">
+                <div class="high-score-section">
+                    <div class="high-score-text">High Score: 0</div>
+                    <div class="group_btn">
+                        <div class="reset-btn">Reset</div>
+                        <div class="close-btn">Close</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="optionsPanel">
-        <h2>Options</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Time (s)</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody id="scoreTableBody">
-                <!-- Score entries will be added here -->
-            </tbody>
-        </table>
-        <button id="muteButton" class="sound-button">Mute</button>
-        <button id="unmuteButton" class="sound-button">Unmute</button>
-        <button id="closeOptionsButton" class="sound-button">Close</button>
+
+    <div id="settingsPanel">
+        <div class="settings-container">
+            <div class="settings-title">SETTINGS</div>
+            <div class="settings-buttons">
+                <button id="restartButton" class="game-button">
+                    <span class="button-text">Restart</span>
+                </button>
+                <button id="continueButton" class="game-button">
+                    <span class="button-text">Continue</span>
+                </button>
+                <button id="settingsOptionButton" class="game-button">
+                    <span class="button-text">Options</span>
+                </button>
+                <button id="mainMenuButton" class="game-button">
+                    <span class="button-text">Main Menu</span>
+                </button>
+            </div>
+        </div>
     </div>
+    
+    <!-- Game Over Panel -->
+    <div id="gameOverPanel">
+        <div class="settings-container">
+            <div class="settings-title">GAME OVER</div>
+            <div class="score-display">
+                <div class="score-text">Score: <span id="finalScore">0</span></div>
+                <div class="high-score-display">High Score: <span id="finalHighScore">0</span></div>
+            </div>
+            <div class="settings-buttons">
+                <button id="restartButtonGameOver" class="game-button">
+                    <span class="button-text">Restart</span>
+                </button>
+                <button id="mainMenuButtonGameOver" class="game-button">
+                    <span class="button-text">Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
     <canvas id="gameCanvas" width="1200" height="600"></canvas>
     <script type="module" src="script.js"></script>
 </body>
