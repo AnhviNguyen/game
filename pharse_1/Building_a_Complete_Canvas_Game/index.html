@@ -19,7 +19,7 @@
             position: absolute;
             width: 60%;
             height: 70%;
-            background-image: url('/img/background_begin.png');
+            background-image: url('img/background_begin.png');
             background-size: 100% 100%;
             background-position: bottom;
             display: flex;
@@ -41,16 +41,26 @@
             cursor: pointer;
         }
         #optionsPanel {
+            display: none; /* Hide the options panel initially */
             position: absolute;
-            width: 60%;
-            height: 70%;
-            background-image: url('/img/background_begin.png');
-            background-size: 100% 100%;
-            background-position: bottom;
-            display: flex;
-            flex-direction: column;
-            justify-content: end;
-            align-items: start;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 8px;
+            text-align: center;
         }
         .sound-button {
             margin: 10px;
@@ -87,7 +97,17 @@
     </div>
     <div id="optionsPanel">
         <h2>Options</h2>
-        <p>Score: <span id="scoreDisplay">0</span></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Time (s)</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="scoreTableBody">
+                <!-- Score entries will be added here -->
+            </tbody>
+        </table>
         <button id="muteButton" class="sound-button">Mute</button>
         <button id="unmuteButton" class="sound-button">Unmute</button>
         <button id="closeOptionsButton" class="sound-button">Close</button>

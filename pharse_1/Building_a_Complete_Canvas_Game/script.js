@@ -12,7 +12,7 @@ const exitButton = document.getElementById('exitButton');
 
 // Get the options panel and buttons
 const optionsPanel = document.getElementById('optionsPanel');
-const scoreDisplay = document.getElementById('scoreDisplay');
+const scoreTableBody = document.getElementById('scoreTableBody');
 const muteButton = document.getElementById('muteButton');
 const unmuteButton = document.getElementById('unmuteButton');
 const closeOptionsButton = document.getElementById('closeOptionsButton');
@@ -50,11 +50,13 @@ const levelConfig = {
 
 // Initialize the game
 let game;
+let startTime;
 
 // Event listeners for buttons
 startButton.addEventListener('click', () => {
     startScreen.style.display = 'none';
     canvas.style.display = 'block';
+    startTime = Date.now();
     game = new Game(canvas, levelConfig, bg, topPipe, bottomPipe, enemies, bgMusic, flapSound, pointSound, hitSound, dieSound, swooshSound);
     bgMusic.loop = true;
     bgMusic.play();
@@ -62,7 +64,7 @@ startButton.addEventListener('click', () => {
 });
 
 optionButton.addEventListener('click', () => {
-    scoreDisplay.textContent = game ? game.score : 0;
+    updateScoreTable();
     optionsPanel.style.display = 'block';
 });
 
@@ -117,5 +119,19 @@ function gameLoop(timestamp) {
         game.draw(ctx, timestamp);
         requestAnimationFrame(gameLoop);
     }
+}
+
+// Function to update the score table
+function updateScoreTable() {
+    scoreTableBody.innerHTML = ''; // Clear existing entries
+    const playtime = Math.floor((Date.now() - startTime) / 1000);
+    const row = document.createElement('tr');
+    const timeCell = document.createElement('td');
+    const scoreCell = document.createElement('td');
+    timeCell.textContent = playtime;
+    scoreCell.textContent = game ? game.score : 0;
+    row.appendChild(timeCell);
+    row.appendChild(scoreCell);
+    scoreTableBody.appendChild(row);
 }
 
