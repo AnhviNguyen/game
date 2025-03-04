@@ -164,10 +164,9 @@ export class Game {
 
 
     draw(ctx, timestamp) {
+        ctx.imageSmoothingEnabled = false; // Disable image smoothing for a pixelated effect
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.drawImage(this.bg, 0, 0, this.canvas.width, this.canvas.height);
-
-
 
         if (this.levelManager.isLevelTransition) {
             const elapsedTime = timestamp - this.levelManager.levelTransitionStartTime;
@@ -183,50 +182,61 @@ export class Game {
             return;
         }
 
+        // Draw pipes with a pixelated style
         this.pipes.forEach(pipe => pipe.draw(ctx, this.topPipe, this.bottomPipe, this.canvas.height));
+
+        // Draw enemy birds with a pixelated style
         this.enemyBirds.forEach(enemy => enemy.draw(ctx, this.enemies));
+
+        // Draw player with a pixelated style
         this.player.draw(ctx);
+
+        // Draw score with a retro font style
         ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
-        ctx.font = '30px Arial';
+        ctx.font = '30px "Press Start 2P", cursive';
         ctx.strokeText(this.score, this.canvas.width / 2 - 10, 50);
         ctx.fillText(this.score, this.canvas.width / 2 - 10, 50);
+
+        // Draw level info with a retro font style
         this.drawLevelInfo(ctx);
         this.levelManager.drawLevelUpMessage(ctx, timestamp);
 
+        // Draw progress bar for next level
+        if (this.levelManager.currentLevel < 5) {
+            const nextRequired = this.levelConfig[this.levelManager.currentLevel].requiredScore;
+            const progress = Math.min(this.score / nextRequired, 1);
+            const barWidth = 200;
+            const barHeight = 20;
+            const barX = 20;
+            const barY = 70;
 
+            // Draw the background of the progress bar
+            ctx.fillStyle = 'black';
+            ctx.fillRect(barX, barY, barWidth, barHeight);
 
-        if (this.gameOver) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            // Draw the filled part of the progress bar
+            ctx.fillStyle = 'green';
+            ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+
+            // Draw the border of the progress bar
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+            // Draw the text above the progress bar
             ctx.fillStyle = 'white';
-            ctx.font = '40px Arial';
-            ctx.fillText('Game Over!', this.canvas.width / 2 - 100, this.canvas.height / 2 - 80);
-            ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2 - 100, this.canvas.height / 2 - 20);
-            ctx.fillText(`Level Reached: ${this.levelManager.currentLevel}`, this.canvas.width / 2 - 100, this.canvas.height / 2 + 40);
-            ctx.font = '20px Arial';
-            ctx.fillText('Click or press Space to restart', this.canvas.width / 2 - 100, this.canvas.height / 2 + 100);
-
+            ctx.fillText(`Next Level: ${this.score}/${nextRequired}`, barX, barY - 10);
         }
+
     }
 
-
-
     drawLevelInfo(ctx) {
+        ctx.font = '20px "Press Start 2P", cursive';
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
-        ctx.font = '20px Arial';
-        ctx.strokeText(`Level: ${this.levelManager.currentLevel}`, 20, 30);
         ctx.fillText(`Level: ${this.levelManager.currentLevel}`, 20, 30);
-
-        if (this.levelManager.currentLevel < 5) {
-            const nextRequired = this.levelConfig[this.levelManager.currentLevel].requiredScore;
-            ctx.strokeText(`Next Level: ${this.score}/${nextRequired}`, 20, 60);
-            ctx.fillText(`Next Level: ${this.score}/${nextRequired}`, 20, 60);
-        }
-        ctx.strokeText(`High Score: ${this.highScore}`, this.canvas.width - 150, 30);
         ctx.fillText(`High Score: ${this.highScore}`, this.canvas.width - 150, 30);
     }
 }

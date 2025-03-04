@@ -191,28 +191,34 @@ mainMenuButtonGameOver.addEventListener('click', () => {
     returnToMainMenu();
 });
 
+
 function returnToMainMenu() {
-    // Cancel animation frame
+    // Hủy khung hình động
     cancelAnimationFrame(gameAnimationId);
     
-    // Hide all panels
+    // Ẩn tất cả các bảng điều khiển và đảm bảo gameOverPanel được ẩn hoàn toàn
     settingsPanel.style.display = 'none';
     gameOverPanel.style.display = 'none';
     canvas.style.display = 'none';
     
-    // Return options container to its original place if it was moved
+    // Đặt lại vị trí của optionsContainer nếu nó đã bị di chuyển
     document.body.appendChild(optionsContainer);
     optionsContainer.style.display = 'none';
     
-    // Show start screen
+    // Hiển thị màn hình bắt đầu
     startScreen.style.display = 'flex';
     boxButton.style.display = 'flex';
     
-    // Stop background music
+    // Dừng nhạc nền
     bgMusic.pause();
     bgMusic.currentTime = 0;
     
     isPaused = false;
+    
+    // Đảm bảo game được reset khi quay lại main menu
+    if (game) {
+        game = null;
+    }
 }
 
 // Event listener for pause/resume with Escape key
