@@ -39,11 +39,13 @@ const bg = new Image();
 const topPipe = new Image();
 const bottomPipe = new Image();
 const enemies = new Image();
+const heartImage = new Image();
 
 bg.src = 'img/background1.jpg';
 topPipe.src = 'img/toppipe.png';
 bottomPipe.src = 'img/bottompipe.png';
 enemies.src = 'img/redbird.png';
+heartImage.src = 'img/heart.png';
 
 // Load audio
 const bgMusic = new Audio('audio/bgm_mario.mp3');
@@ -68,6 +70,10 @@ let startTime;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameAnimationId; // Store the animation frame ID for pausing
 let isPaused = false;
+
+// Initialize hearts
+let hearts = [];
+let lives = 3; // Starting number of lives
 
 // Update high score text
 function updateHighScoreDisplay() {

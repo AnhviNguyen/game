@@ -2,6 +2,7 @@ import { Enemy } from "./enemy.js";
 import { LevelManager } from "./levelManager.js";
 import { Pipe } from "./pipe.js";
 import { Player } from "./player.js";
+import { Heart } from './heart.js';
 
 export class Game {
 
@@ -27,7 +28,10 @@ export class Game {
         this.highScore = 0;
         this.gameOver = false;
         this.lastPipe = 0;
-        this.levelTransitionDuration = 2000;
+        this.levelTransitionDuration = 1000;
+        this.hearts = [];
+        this.lives = 3; // Starting number of lives
+        this.heart = new Heart();
 
     }
 
@@ -45,9 +49,9 @@ export class Game {
         this.levelManager.showLevelUp = false;
         this.bgMusic.currentTime = 0;
         this.bgMusic.play();
-
+        this.lives = 3; // Reset số mạng ban đầu
+        this.hearts = []; // Reset danh sách hearts
     }
-
 
 
     createPipe() {
@@ -106,8 +110,35 @@ export class Game {
             this.checkCollisions();
             this.levelManager.checkLevelUp(this.score, timestamp);
 
+            // Move hearts with the screen
+            this.hearts.forEach((heart, index) => {
+                heart.x -= config.pipeSpeed;
+                if (heart.x < -20) {
+                    this.hearts.splice(index, 1);
+                }
+            });
+
+            // Randomly create hearts less frequently
+            if (Math.random() < 0.003) {
+                this.createHeart();
+            }
+
+            this.checkHeartCollisions();
+
         }
 
+        if (this.lives < 0) {
+            this.lives = 0;
+        }
+
+        if (this.lives > 0) {
+            return; // Continue the game
+        }
+
+        // Reset lastPipe during level transitions
+        if (this.levelManager.isLevelTransition) {
+            this.lastPipe = timestamp;
+        }
     }
 
 
@@ -118,15 +149,20 @@ export class Game {
                 if (this.player.x + 34 > pipe.x && this.player.x < pipe.x + 52) {
                     if (this.player.y < pipe.topHeight || this.player.y + 24 > pipe.topHeight + pipe.pipeGap) {
                         this.hitSound.play();
-                        this.dieSound.play();
-                        this.gameOver = true;
-                        this.bgMusic.pause();
-                        this.highScore = Math.max(this.highScore, this.score);
+                        this.lives--;
+                        if (this.lives > 0) {
+                            // Nếu còn mạng, di chuyển đến vị trí an toàn
+                            this.moveToSafePosition();
+                        } else {
+                            // Nếu hết mạng, game over
+                            this.dieSound.play();
+                            this.gameOver = true;
+                            this.bgMusic.pause();
+                            this.highScore = Math.max(this.highScore, this.score);
+                        }
                     }
                 }
-
-
-
+    
                 if (!pipe.passed && this.player.x > pipe.x + 52) {
                     this.score++;
                     pipe.passed = true;
@@ -134,34 +170,43 @@ export class Game {
                 }
             }
         });
-
-
-
+    
         this.enemyBirds.forEach(enemy => {
             if (this.player.x < enemy.x + enemy.width && this.player.x + 34 > enemy.x &&
                 this.player.y < enemy.y + enemy.height && this.player.y + 24 > enemy.y) {
                 this.hitSound.play();
-                this.dieSound.play();
-                this.gameOver = true;
-                this.bgMusic.pause();
-                this.highScore = Math.max(this.highScore, this.score);
+                this.lives--;
+                if (this.lives > 0) {
+                    // Nếu còn mạng, di chuyển đến vị trí an toàn
+                    this.moveToSafePosition();
+                } else {
+                    // Nếu hết mạng, game over
+                    this.dieSound.play();
+                    this.gameOver = true;
+                    this.bgMusic.pause();
+                    this.highScore = Math.max(this.highScore, this.score);
+                }
             }
         });
-
-
-
+    
+        // Kiểm tra va chạm với mép trên/dưới màn hình
         if (this.player.y < 0 || this.player.y + 24 > this.canvas.height) {
             if (!this.gameOver) {
                 this.hitSound.play();
-                this.dieSound.play();
-                this.gameOver = true;
-                this.bgMusic.pause();
-                this.highScore = Math.max(this.highScore, this.score);
-
+                this.lives--;
+                if (this.lives > 0) {
+                    // Nếu còn mạng, di chuyển đến vị trí an toàn
+                    this.moveToSafePosition();
+                } else {
+                    // Nếu hết mạng, game over
+                    this.dieSound.play();
+                    this.gameOver = true;
+                    this.bgMusic.pause();
+                    this.highScore = Math.max(this.highScore, this.score);
+                }
             }
         }
     }
-
 
 
     draw(ctx, timestamp) {
@@ -216,22 +261,46 @@ export class Game {
 
             // Draw the background of the progress bar
             ctx.fillStyle = 'black';
-            ctx.fillRect(barX, barY, barWidth, barHeight);
+            ctx.fillRect(barX +130, barY -15, barWidth, barHeight);
 
             // Draw the filled part of the progress bar
             ctx.fillStyle = 'green';
-            ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+            ctx.fillRect(barX +130, barY -15, barWidth * progress, barHeight);
 
             // Draw the border of the progress bar
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
-            ctx.strokeRect(barX, barY, barWidth, barHeight);
+            ctx.strokeRect(barX +130, barY -15, barWidth, barHeight);
 
             // Draw the text above the progress bar
             ctx.fillStyle = 'white';
-            ctx.fillText(`Next Level: ${this.score}/${nextRequired}`, barX, barY - 10);
+            ctx.fillText(`Next Level: `, barX, barY );
         }
 
+        // Draw hearts
+        this.hearts.forEach(heart => {
+            this.heart.draw(ctx, heart.x, heart.y);
+        });
+
+        // Draw lives and progress bar
+        ctx.fillStyle = 'white';
+        ctx.font = '20px "Press Start 2P", cursive';
+        ctx.fillText(`Lives:`, 20, 100);
+
+        const barWidth = 200;
+        const barHeight = 20;
+        const barX = 20;
+        const barY = 90;
+ 
+        ctx.fillStyle = 'black';
+        ctx.fillRect(barX +130, barY, barWidth, barHeight);
+
+        ctx.fillStyle = 'red';
+        ctx.fillRect(barX +130, barY, barWidth * (this.lives / 5), barHeight);
+
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX +130, barY, barWidth, barHeight);
     }
 
     drawLevelInfo(ctx) {
@@ -241,5 +310,35 @@ export class Game {
         ctx.lineWidth = 2;
         ctx.fillText(`Level: ${this.levelManager.currentLevel}`, 20, 30);
         ctx.fillText(`High Score: ${this.highScore}`, this.canvas.width - 150, 30);
+    }
+
+    createHeart() {
+        const xPosition = Math.random() * (this.canvas.width - 50) + 25;
+        const yPosition = Math.random() * (this.canvas.height - 50) + 25;
+        this.hearts.push({ x: xPosition, y: yPosition });
+    }
+
+    checkHeartCollisions() {
+        this.hearts.forEach((heart, index) => {
+            if (this.player.x < heart.x + 20 && this.player.x + 34 > heart.x &&
+                this.player.y < heart.y + 20 && this.player.y + 24 > heart.y) {
+                this.hearts.splice(index, 1);
+                this.lives++;
+                // Play a sound or animation for collecting a heart
+            }
+        });
+    }
+
+    moveToSafePosition() {
+        this.player.x = this.canvas.width / 4;
+        this.player.y = this.canvas.height / 2;
+        this.player.velocity = 0;
+
+        // Only remove pipes that are too close to the player
+        this.pipes = this.pipes.filter(pipe => pipe.x > this.player.x + 100);
+        this.enemyBirds = this.enemyBirds.filter(enemy => enemy.x > this.player.x + 100);
+
+        // Ensure createPipe is called regularly
+        this.lastPipe = Date.now() - this.levelManager.getCurrentConfig().pipeInterval;
     }
 }
