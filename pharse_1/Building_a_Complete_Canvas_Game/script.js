@@ -73,7 +73,7 @@ let isPaused = false;
 
 // Initialize hearts
 let hearts = [];
-let lives = 3; // Starting number of lives
+let lives = 1; // Starting number of lives
 
 // Update high score text
 function updateHighScoreDisplay() {

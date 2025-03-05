@@ -30,7 +30,7 @@ export class Game {
         this.lastPipe = 0;
         this.levelTransitionDuration = 1000;
         this.hearts = [];
-        this.lives = 3; // Starting number of lives
+        this.lives = 1; // Starting number of lives
         this.heart = new Heart();
 
     }
@@ -49,7 +49,7 @@ export class Game {
         this.levelManager.showLevelUp = false;
         this.bgMusic.currentTime = 0;
         this.bgMusic.play();
-        this.lives = 3; // Reset số mạng ban đầu
+        this.lives = 1; // Reset số mạng ban đầu
         this.hearts = []; // Reset danh sách hearts
     }
 
@@ -296,7 +296,7 @@ export class Game {
         ctx.fillRect(barX +130, barY, barWidth, barHeight);
 
         ctx.fillStyle = 'red';
-        ctx.fillRect(barX +130, barY, barWidth * (this.lives / 5), barHeight);
+        ctx.fillRect(barX +130, barY, barWidth * (this.lives / 3), barHeight);
 
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 2;
