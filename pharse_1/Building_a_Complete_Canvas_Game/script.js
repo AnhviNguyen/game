@@ -55,11 +55,11 @@ const swooshSound = new Audio('audio/sfx_swooshing.wav');
 
 // Define levelConfig
 const levelConfig = {
-    1: { pipeSpeed: 1.5, pipeInterval: 2400, gravity: 0.2, pipeGap: 240, requiredScore: 5, pipeOscillation: 0 },
-    2: { pipeSpeed: 2, pipeInterval: 2000, gravity: 0.25, pipeGap: 200, requiredScore: 10, pipeOscillation: 0 },
-    3: { pipeSpeed: 2.5, pipeInterval: 1600, gravity: 0.28, pipeGap: 160, requiredScore: 15, pipeOscillation: 1 },
-    4: { pipeSpeed: 3, pipeInterval: 1200, gravity: 0.3, pipeGap: 120, requiredScore: 20, pipeOscillation: 1.5 },
-    5: { pipeSpeed: 3.5, pipeInterval: 800, gravity: 0.32, pipeGap: 100, requiredScore: 25, pipeOscillation: 2 }
+    1: { pipeSpeed: 1.5, pipeInterval: 3000, gravity: 0.2, pipeGap: 240, requiredScore: 1, pipeOscillation: 0 },
+    2: { pipeSpeed: 2, pipeInterval: 2600, gravity: 0.25, pipeGap: 200, requiredScore: 2, pipeOscillation: 0 },
+    3: { pipeSpeed: 2.5, pipeInterval: 2200, gravity: 0.28, pipeGap: 160, requiredScore: 15, pipeOscillation: 1 },
+    4: { pipeSpeed: 3, pipeInterval: 1800, gravity: 0.3, pipeGap: 120, requiredScore: 20, pipeOscillation: 1.5 },
+    5: { pipeSpeed: 3.5, pipeInterval: 1400, gravity: 0.32, pipeGap: 100, requiredScore: 25, pipeOscillation: 2 }
 };
 
 // Initialize the game
@@ -84,6 +84,7 @@ startButton.addEventListener('click', () => {
     canvas.style.display = 'block';
     startTime = Date.now();
     game = new Game(canvas, levelConfig, bg, topPipe, bottomPipe, enemies, bgMusic, flapSound, pointSound, hitSound, dieSound, swooshSound);
+    canvas.gameInstance = game; 
     bgMusic.loop = true;
     if (!musicToggle.checked) {
         bgMusic.muted = true;

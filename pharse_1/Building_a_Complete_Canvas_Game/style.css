@@ -367,6 +367,7 @@ button {
     position: fixed;
     top: 10%;
     left: 30%;
+    z-index: 10;
 }
 
 @keyframes slideIn {

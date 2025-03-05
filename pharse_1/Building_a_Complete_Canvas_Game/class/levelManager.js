@@ -1,5 +1,4 @@
 export class LevelManager {
-
     constructor(canvas, levelConfig, bg, swooshSound) {
         this.canvas = canvas;
         this.levelConfig = levelConfig;
@@ -11,23 +10,30 @@ export class LevelManager {
         this.showLevelUp = false;
         this.levelUpStartTime = 0;
         this.levelUpDuration = 1000;
+
+        // Define background images for each level
+        this.backgroundImages = [
+            'img/background1.jpg',
+            'img/background2.jpg',
+            'img/background3.jpg',
+            'img/background4.jpg',
+            'img/background5.jpg'
+        ];
+
+        // Update background image when level changes
+        if (this.currentLevel < this.backgroundImages.length) {
+            this.bg.src = this.backgroundImages[this.currentLevel];
+        }
     }
-
-
 
     getCurrentConfig() {
         return this.levelConfig[this.currentLevel];
     }
 
-
-
     checkLevelUp(score, timestamp) {
-
         if (this.currentLevel < 5) {
             const config = this.getCurrentConfig();
             if (score >= config.requiredScore && !this.showLevelUp && !this.isLevelTransition) {
-                this.currentLevel++;
-                this.bg.src = `img/background${this.currentLevel}.jpg`;
                 this.showLevelUp = true;
                 this.levelUpStartTime = timestamp;
                 this.levelTransitionStartTime = timestamp;
@@ -38,8 +44,6 @@ export class LevelManager {
         }
         return false;
     }
-
-
 
     drawLevelUpMessage(ctx, timestamp) {
         if (!this.showLevelUp) return;
@@ -69,12 +73,17 @@ export class LevelManager {
         ctx.lineWidth = 3;
         ctx.textAlign = 'center';
         ctx.font = 'bold 48px Arial';
-        ctx.strokeText(`Level ${this.currentLevel}!`, 0, -20);
-        ctx.fillText(`Level ${this.currentLevel}!`, 0, -20);
+        ctx.strokeText(`Level ${this.currentLevel +1 }!`, 0, -20);
+        ctx.fillText(`Level ${this.currentLevel + 1}!`, 0, -20);
         ctx.font = '24px Arial';
         ctx.strokeText('Get ready for increased difficulty!', 0, 20);
         ctx.fillText('Get ready for increased difficulty!', 0, 20);
         ctx.restore()
     }
-}
 
+    updateBackground() {
+        if (this.currentLevel < this.backgroundImages.length) {
+            this.bg.src = this.backgroundImages[this.currentLevel];
+        }
+    }
+}

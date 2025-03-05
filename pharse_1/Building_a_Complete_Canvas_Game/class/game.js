@@ -76,7 +76,8 @@ export class Game {
 
 
 
-            if (!this.lastPipe || timestamp - this.lastPipe >= config.pipeInterval) {
+            const randomOffset = Math.random() * 500; // Add randomness to pipe creation timing
+            if (!this.lastPipe || timestamp - this.lastPipe >= config.pipeInterval + randomOffset) {
                 this.createPipe();
                 if (Math.random() < 0.8) {
                     this.createEnemyBird();
@@ -178,6 +179,8 @@ export class Game {
             if (elapsedTime > this.levelTransitionDuration) {
                 this.levelManager.isLevelTransition = false;
                 this.levelManager.showLevelUp = false;
+                this.levelManager.currentLevel++;
+                this.levelManager.updateBackground();
             }
             return;
         }
