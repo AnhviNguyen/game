@@ -214,13 +214,14 @@ export class Game {
             }
         });
 
+        // Check collision with top/bottom edges of the canvas
         if (this.player.y < 0 || this.player.y + 24 > this.canvas.height) {
             if (!this.gameOver) {
                 this.hitSound.play();
                 this.lives--;
-                this.lastLostLevel = this.levelManager.currentLevel;
+                this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
                 if (this.lives > 0) {
-                    this.resetCurrentLevel();
+                    this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
                 } else {
                     this.dieSound.play();
                     this.gameOver = true;
