@@ -3,6 +3,7 @@ import { LevelManager } from "./levelManager.js";
 import { Pipe } from "./pipe.js";
 import { Player } from "./player.js";
 import { Heart } from './heart.js';
+import { Speech } from './speech.js';
 
 export class Game {
 
@@ -33,6 +34,10 @@ export class Game {
         this.hearts = [];
         this.lives = 1; // Starting number of lives
         this.heart = new Heart();
+        this.speeches = [];
+        this.speech = new Speech();
+        this.isSpeechActive = false; // Trạng thái hiệu ứng Speech
+        this.speechEffectStartTime = null; // Thời gian bắt đầu hiệu ứng
 
         this.updateBackground();
 
@@ -61,6 +66,7 @@ export class Game {
         this.bgMusic.play();
         this.lives = 1; // Reset số mạng ban đầu
         this.hearts = [];
+        this.speeches = [];
     }
 
 
@@ -88,9 +94,7 @@ export class Game {
         if (!this.gameOver && !this.levelManager.isLevelTransition) {
             this.player.update(config.gravity);
 
-
-
-            const randomOffset = Math.random() * 500; // Add randomness to pipe creation timing
+            const randomOffset = Math.random() * 500;
             if (!this.lastPipe || timestamp - this.lastPipe >= config.pipeInterval + randomOffset) {
                 this.createPipe();
                 if (Math.random() < 0.8) {
@@ -99,16 +103,12 @@ export class Game {
                 this.lastPipe = timestamp;
             }
 
-
-
             this.pipes.forEach((pipe, index) => {
                 pipe.update(config.pipeSpeed, timestamp, config.pipeOscillation);
                 if (pipe.isOffScreen()) {
                     this.pipes.splice(index, 1);
                 }
             });
-
-
 
             this.enemyBirds.forEach((enemy, index) => {
                 enemy.update();
@@ -128,13 +128,27 @@ export class Game {
                 }
             });
 
-            // Randomly create hearts less frequently
-            if (Math.random() < 0.003) {
+            // Randomly create hearts
+            if (Math.random() < 0.0009) {
                 this.createHeart();
             }
 
             this.checkHeartCollisions();
 
+            // Move speeches with the screen
+            this.speeches.forEach((speech, index) => {
+                speech.x -= config.pipeSpeed;
+                if (speech.x < -20) {
+                    this.speeches.splice(index, 1);
+                }
+            });
+
+            // Randomly create speeches
+            if (Math.random() < 0.0005) {
+                this.createSpeech();
+            }
+
+            this.checkSpeechCollisions();
         }
 
         if (this.lives < 0) {
@@ -145,7 +159,6 @@ export class Game {
             return; // Continue the game
         }
 
-        // Reset lastPipe during level transitions
         if (this.levelManager.isLevelTransition) {
             this.lastPipe = timestamp;
         }
@@ -154,15 +167,19 @@ export class Game {
 
 
     checkCollisions() {
+        if (this.isSpeechActive) {
+            return; // Bỏ qua tất cả va chạm khi hiệu ứng Speech đang hoạt động
+        }
+
         this.pipes.forEach(pipe => {
             if (!this.gameOver) {
                 if (this.player.x + 34 > pipe.x && this.player.x < pipe.x + 52) {
                     if (this.player.y < pipe.topHeight || this.player.y + 24 > pipe.topHeight + pipe.pipeGap) {
                         this.hitSound.play();
                         this.lives--;
-                        this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
+                        this.lastLostLevel = this.levelManager.currentLevel;
                         if (this.lives > 0) {
-                            this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
+                            this.resetCurrentLevel();
                         } else {
                             this.dieSound.play();
                             this.gameOver = true;
@@ -171,7 +188,7 @@ export class Game {
                         }
                     }
                 }
-    
+
                 if (!pipe.passed && this.player.x > pipe.x + 52) {
                     this.score++;
                     pipe.passed = true;
@@ -179,15 +196,15 @@ export class Game {
                 }
             }
         });
-    
+
         this.enemyBirds.forEach(enemy => {
             if (this.player.x < enemy.x + enemy.width && this.player.x + 34 > enemy.x &&
                 this.player.y < enemy.y + enemy.height && this.player.y + 24 > enemy.y) {
                 this.hitSound.play();
                 this.lives--;
-                this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
+                this.lastLostLevel = this.levelManager.currentLevel;
                 if (this.lives > 0) {
-                    this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
+                    this.resetCurrentLevel();
                 } else {
                     this.dieSound.play();
                     this.gameOver = true;
@@ -196,15 +213,14 @@ export class Game {
                 }
             }
         });
-    
-        // Kiểm tra va chạm với mép trên/dưới màn hình
+
         if (this.player.y < 0 || this.player.y + 24 > this.canvas.height) {
             if (!this.gameOver) {
                 this.hitSound.play();
                 this.lives--;
-                this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
+                this.lastLostLevel = this.levelManager.currentLevel;
                 if (this.lives > 0) {
-                    this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
+                    this.resetCurrentLevel();
                 } else {
                     this.dieSound.play();
                     this.gameOver = true;
@@ -308,6 +324,11 @@ export class Game {
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 2;
         ctx.strokeRect(barX +130, barY, barWidth, barHeight);
+
+        // Draw speeches
+        this.speeches.forEach(speech => {
+            this.speech.draw(ctx, speech.x, speech.y);
+        });
     }
 
     drawLevelInfo(ctx) {
@@ -332,6 +353,26 @@ export class Game {
                 this.hearts.splice(index, 1);
                 this.lives++;
                 // Play a sound or animation for collecting a heart
+            }
+        });
+    }
+
+    createSpeech() {
+        const xPosition = Math.random() * (this.canvas.width - 50) + 25;
+        const yPosition = Math.random() * (this.canvas.height - 50) + 25;
+        this.speeches.push({ x: xPosition, y: yPosition });
+    }
+
+    checkSpeechCollisions() {
+        this.speeches.forEach((speech, index) => {
+            if (this.player.x < speech.x + 20 && this.player.x + 34 > speech.x &&
+                this.player.y < speech.y + 20 && this.player.y + 24 > speech.y) {
+                this.speeches.splice(index, 1);
+                this.speech.applyEffect(this.player, this); // Truyền game vào để quản lý trạng thái
+                // Thêm âm thanh khi thu thập (tùy chọn)
+                if (!this.flapSound.muted) {
+                    this.pointSound.play(); // Sử dụng pointSound hoặc thêm âm thanh mới
+                }
             }
         });
     }
