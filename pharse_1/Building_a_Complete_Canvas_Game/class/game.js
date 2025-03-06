@@ -19,6 +19,7 @@ export class Game {
         this.hitSound = hitSound;
         this.dieSound = dieSound;
         this.swooshSound = swooshSound;
+        this.lastLostLevel = 1;
 
         this.player = new Player(canvas, flapSound);
         this.pipes = [];
@@ -33,6 +34,14 @@ export class Game {
         this.lives = 1; // Starting number of lives
         this.heart = new Heart();
 
+        this.updateBackground();
+
+    }
+
+    updateBackground() {
+        if (this.levelManager.currentLevel - 1 < this.levelManager.backgroundImages.length) {
+            this.bg.src = this.levelManager.backgroundImages[this.levelManager.currentLevel - 1];
+        }
     }
 
 
@@ -43,14 +52,15 @@ export class Game {
         this.enemyBirds = [];
         this.score = 0;
         this.lastPipe = 0;
-        this.levelManager.currentLevel = 1;
-        this.bg.src = 'img/background1.jpg';
+        this.levelManager.currentLevel = 1; // Reset về level 1 khi reset hoàn toàn
+        this.lastLostLevel = 1; // Reset level mất mạng về 1
+        this.updateBackground(); // Cập nhật background theo level 1
         this.gameOver = false;
         this.levelManager.showLevelUp = false;
         this.bgMusic.currentTime = 0;
         this.bgMusic.play();
         this.lives = 1; // Reset số mạng ban đầu
-        this.hearts = []; // Reset danh sách hearts
+        this.hearts = [];
     }
 
 
@@ -150,11 +160,10 @@ export class Game {
                     if (this.player.y < pipe.topHeight || this.player.y + 24 > pipe.topHeight + pipe.pipeGap) {
                         this.hitSound.play();
                         this.lives--;
+                        this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
                         if (this.lives > 0) {
-                            // Nếu còn mạng, di chuyển đến vị trí an toàn
-                            this.moveToSafePosition();
+                            this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
                         } else {
-                            // Nếu hết mạng, game over
                             this.dieSound.play();
                             this.gameOver = true;
                             this.bgMusic.pause();
@@ -176,11 +185,10 @@ export class Game {
                 this.player.y < enemy.y + enemy.height && this.player.y + 24 > enemy.y) {
                 this.hitSound.play();
                 this.lives--;
+                this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
                 if (this.lives > 0) {
-                    // Nếu còn mạng, di chuyển đến vị trí an toàn
-                    this.moveToSafePosition();
+                    this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
                 } else {
-                    // Nếu hết mạng, game over
                     this.dieSound.play();
                     this.gameOver = true;
                     this.bgMusic.pause();
@@ -194,11 +202,10 @@ export class Game {
             if (!this.gameOver) {
                 this.hitSound.play();
                 this.lives--;
+                this.lastLostLevel = this.levelManager.currentLevel; // Lưu level mà người chơi mất mạng
                 if (this.lives > 0) {
-                    // Nếu còn mạng, di chuyển đến vị trí an toàn
-                    this.moveToSafePosition();
+                    this.resetCurrentLevel(); // Reset nhưng giữ level hiện tại
                 } else {
-                    // Nếu hết mạng, game over
                     this.dieSound.play();
                     this.gameOver = true;
                     this.bgMusic.pause();
@@ -329,16 +336,21 @@ export class Game {
         });
     }
 
-    moveToSafePosition() {
-        this.player.x = this.canvas.width / 4;
-        this.player.y = this.canvas.height / 2;
-        this.player.velocity = 0;
+    resetLevel() {
+        this.reset();
+        this.levelManager.currentLevel = this.lastLostLevel; // Reset về level mất mạng gần nhất
+        this.levelManager.updateBackground(); // Cập nhật background theo level
+        this.bgMusic.currentTime = 0;
+        this.bgMusic.play();
+    }
 
-        // Only remove pipes that are too close to the player
-        this.pipes = this.pipes.filter(pipe => pipe.x > this.player.x + 100);
-        this.enemyBirds = this.enemyBirds.filter(enemy => enemy.x > this.player.x + 100);
-
-        // Ensure createPipe is called regularly
-        this.lastPipe = Date.now() - this.levelManager.getCurrentConfig().pipeInterval;
+    resetCurrentLevel() {
+        this.player.reset();
+        this.pipes = [];
+        this.enemyBirds = [];
+        this.lastPipe = 0;
+        this.bg.src = this.levelManager.backgroundImages[this.levelManager.currentLevel - 1]; // Cập nhật background theo level hiện tại
+        this.bgMusic.currentTime = 0;
+        this.bgMusic.play();
     }
 }

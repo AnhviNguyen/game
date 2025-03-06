@@ -20,10 +20,8 @@ export class LevelManager {
             'img/background5.jpg'
         ];
 
-        // Update background image when level changes
-        if (this.currentLevel < this.backgroundImages.length) {
-            this.bg.src = this.backgroundImages[this.currentLevel];
-        }
+        // Cập nhật background ngay khi khởi tạo
+        this.updateBackground();
     }
 
     getCurrentConfig() {
@@ -82,8 +80,8 @@ export class LevelManager {
     }
 
     updateBackground() {
-        if (this.currentLevel < this.backgroundImages.length) {
-            this.bg.src = this.backgroundImages[this.currentLevel];
+        if (this.currentLevel - 1 < this.backgroundImages.length) {
+            this.bg.src = this.backgroundImages[this.currentLevel - 1];
         }
     }
 }
