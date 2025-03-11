@@ -30,9 +30,6 @@ export class PowerUpManager {
         // Player position history for clone movement
         this.playerPositionHistory = [];
         this.positionHistoryMaxLength = 15;
-        
-        // Flag to track if all levels have been completed
-        this.allLevelsCompleted = false;
     }
     
     /**
@@ -44,7 +41,6 @@ export class PowerUpManager {
         this.clonePowerups = [];
         this.pointerPowerups = [];
         this.playerPositionHistory = [];
-        this.allLevelsCompleted = false;
     }
     
     /**
@@ -73,12 +69,6 @@ export class PowerUpManager {
         this.updateSpeeches(config);
         this.updateClonePowerups(config);
         this.updatePointerPowerups(config);
-        
-        // Check if all levels have been completed
-        const maxLevel = Object.keys(this.game.levelConfig).length;
-        if (this.game.levelManager.currentLevel > maxLevel) {
-            this.allLevelsCompleted = true;
-        }
     }
     
     /**
@@ -95,7 +85,7 @@ export class PowerUpManager {
         });
 
         // Randomly create hearts
-        if (Math.random() < 0.0009) {
+        if (Math.random() < 0.0005) {
             this.createHeart();
         }
         
@@ -116,7 +106,7 @@ export class PowerUpManager {
         });
 
         // Randomly create speeches
-        if (Math.random() < 0.0004) {
+        if (Math.random() < 0.0005) {
             this.createSpeech();
         }
         
@@ -149,22 +139,18 @@ export class PowerUpManager {
      * @param {Object} config - Current level configuration
      */
     updatePointerPowerups(config) {
-        // Only spawn pointer power-ups if all levels have been completed
-        if (!this.allLevelsCompleted) {
-            return;
-        }
-        
         // Update existing pointer power-ups
         this.pointerPowerups.forEach((pointer, index) => {
             pointer.x -= config.pipeSpeed;
-            if (pointer.x < -30) {
+            if (pointer.x < -40) {
                 this.pointerPowerups.splice(index, 1);
             }
         });
 
-        // Randomly create pointer power-ups (rare)
-        if (Math.random() < 0.55) {
+        // Randomly create pointer power-ups
+        if (Math.random() < 0.0005) {
             this.createPointerPowerup();
+            console.log("Created pointer power-up. Total:", this.pointerPowerups.length);
         }
         
         this.checkPointerCollisions();
@@ -192,7 +178,7 @@ export class PowerUpManager {
         
         // Draw pointer power-ups
         this.pointerPowerups.forEach(pointer => 
-            ctx.drawImage(this.pointer.image, pointer.x, pointer.y, pointer.width, pointer.height)
+            this.pointer.draw(ctx, pointer.x, pointer.y)
         );
     }
     
@@ -290,8 +276,15 @@ export class PowerUpManager {
      */
     createPointerPowerup() {
         const pointer = Object.create(this.pointer);
+        
+        // Position the pointer at the right edge of the screen with random height
         pointer.x = this.game.canvas.width;
-        pointer.y = Math.random() * (this.game.canvas.height - 30);
+        pointer.y = Math.random() * (this.game.canvas.height - 80) + 40;
+        
+        // Add width and height properties
+        pointer.width = 40;
+        pointer.height = 40;
+        
         this.pointerPowerups.push(pointer);
     }
     
@@ -312,7 +305,9 @@ export class PowerUpManager {
                 this.pointerPowerups.splice(index, 1);
                 
                 // Play a sound effect
-                this.game.pointSound.play();
+                if (!this.game.flapSound.muted) {
+                    this.game.pointSound.play();
+                }
             }
         });
     }
