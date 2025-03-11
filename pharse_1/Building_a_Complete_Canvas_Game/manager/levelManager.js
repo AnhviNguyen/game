@@ -1,4 +1,14 @@
+/**
+ * LevelManager class handling level transitions and configurations
+ */
 export class LevelManager {
+    /**
+     * Initialize the level manager
+     * @param {HTMLCanvasElement} canvas - The game canvas
+     * @param {Object} levelConfig - Configuration for different game levels
+     * @param {Image} bg - Background image
+     * @param {Audio} swooshSound - Level transition sound
+     */
     constructor(canvas, levelConfig, bg, swooshSound) {
         this.canvas = canvas;
         this.levelConfig = levelConfig;
@@ -20,14 +30,24 @@ export class LevelManager {
             'img/background5.jpg'
         ];
 
-        // Cập nhật background ngay khi khởi tạo
+        // Update background on initialization
         this.updateBackground();
     }
 
+    /**
+     * Get the configuration for the current level
+     * @returns {Object} - Current level configuration
+     */
     getCurrentConfig() {
         return this.levelConfig[this.currentLevel];
     }
 
+    /**
+     * Check if player should level up based on score
+     * @param {number} score - Current player score
+     * @param {number} timestamp - Current animation timestamp
+     * @returns {boolean} - True if level up occurred
+     */
     checkLevelUp(score, timestamp) {
         if (this.currentLevel < 5) {
             const config = this.getCurrentConfig();
@@ -43,6 +63,11 @@ export class LevelManager {
         return false;
     }
 
+    /**
+     * Draw the level up message with animation
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {number} timestamp - Current animation timestamp
+     */
     drawLevelUpMessage(ctx, timestamp) {
         if (!this.showLevelUp) return;
         const elapsedTime = timestamp - this.levelUpStartTime;
@@ -71,14 +96,17 @@ export class LevelManager {
         ctx.lineWidth = 3;
         ctx.textAlign = 'center';
         ctx.font = 'bold 48px Arial';
-        ctx.strokeText(`Level ${this.currentLevel +1 }!`, 0, -20);
+        ctx.strokeText(`Level ${this.currentLevel + 1}!`, 0, -20);
         ctx.fillText(`Level ${this.currentLevel + 1}!`, 0, -20);
         ctx.font = '24px Arial';
         ctx.strokeText('Get ready for increased difficulty!', 0, 20);
         ctx.fillText('Get ready for increased difficulty!', 0, 20);
-        ctx.restore()
+        ctx.restore();
     }
 
+    /**
+     * Update the background image based on current level
+     */
     updateBackground() {
         if (this.currentLevel - 1 < this.backgroundImages.length) {
             this.bg.src = this.backgroundImages[this.currentLevel - 1];

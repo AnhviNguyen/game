@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Bird</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Start Screen -->
     <div id="startScreen">
         <div class="box-button">
+            <!-- Start Button -->
             <button id="startButton" class="button-84-pushable" role="button">
                 <span class="button-84-shadow"></span>
                 <span class="button-84-edge"></span>
                 <span class="button-84-front text">
-                Start
+                    Start
                 </span>
             </button>
+            
+            <!-- Options Button -->
             <button id="optionButton" class="button-83-pushable" role="button">
                 <span class="button-83-shadow"></span>
                 <span class="button-83-edge"></span>
@@ -22,17 +28,22 @@
                     Option
                 </span>
             </button>
+            
+            <!-- Exit Button -->
             <button id="exitButton" class="button-82-pushable" role="button">
                 <span class="button-82-shadow"></span>
                 <span class="button-82-edge"></span>
                 <span class="button-82-front text">
-                Exit
+                    Exit
                 </span>
             </button>
         </div>
         
+        <!-- Options Container -->
         <div class="options-container">
             <div class="title">OPTIONS</div>
+            
+            <!-- Sound Settings -->
             <div class="section">
                 <div class="section-title">Sound</div>
                 <div class="sound-option">
@@ -50,6 +61,8 @@
                     </label>
                 </div>
             </div>
+            
+            <!-- High Score Section -->
             <div class="section">
                 <div class="high-score-section">
                     <div class="high-score-text">High Score: 0</div>
@@ -62,6 +75,7 @@
         </div>
     </div>
 
+    <!-- Settings Panel (Pause Menu) -->
     <div id="settingsPanel">
         <div class="settings-container">
             <div class="settings-title">SETTINGS</div>
@@ -101,8 +115,10 @@
         </div>
     </div>
 
-    
+    <!-- Game Canvas -->
     <canvas id="gameCanvas" width="1200" height="600"></canvas>
+    
+    <!-- Main Script -->
     <script type="module" src="script.js"></script>
 </body>
 </html>

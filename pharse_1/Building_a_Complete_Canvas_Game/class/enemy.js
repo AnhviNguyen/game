@@ -1,5 +1,13 @@
+/**
+ * Enemy class representing the enemy birds in the game
+ */
 export class Enemy {
-
+    /**
+     * Initialize a new enemy
+     * @param {number} x - Initial x position
+     * @param {number} y - Initial y position
+     * @param {number} speed - Movement speed
+     */
     constructor(x, y, speed) {
         this.x = x;
         this.y = y;
@@ -8,14 +16,18 @@ export class Enemy {
         this.speed = speed;
     }
 
-
-
+    /**
+     * Update enemy position
+     */
     update() {
         this.x -= this.speed;
     }
 
-
-
+    /**
+     * Draw the enemy
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {Image} enemies - Enemy image
+     */
     draw(ctx, enemies) {
         ctx.save();
         ctx.translate(this.x + 17, this.y + 12);
@@ -23,8 +35,10 @@ export class Enemy {
         ctx.restore();
     }
 
-
-
+    /**
+     * Check if enemy is off screen
+     * @returns {boolean} - True if enemy is off screen
+     */
     isOffScreen() {
         return this.x + this.width < 0;
     }

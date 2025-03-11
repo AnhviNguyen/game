@@ -1,17 +1,22 @@
 import { Game } from "./class/game.js";
 
-// Get the canvas element
+/**
+ * Flappy Bird Game - Main Script
+ * Handles game initialization, UI interactions, and game loop
+ */
+
+// DOM Elements
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Get the start screen and buttons
+// Start screen elements
 const startScreen = document.getElementById('startScreen');
 const startButton = document.getElementById('startButton');
 const optionButton = document.getElementById('optionButton');
 const exitButton = document.getElementById('exitButton');
 const boxButton = document.querySelector('.box-button');
 
-// Get the options panel elements
+// Options panel elements
 const optionsContainer = document.querySelector('.options-container');
 const closeBtn = document.querySelector('.close-btn');
 const resetBtn = document.querySelector('.reset-btn');
@@ -19,7 +24,7 @@ const musicToggle = document.querySelector('.sound-option:nth-child(2) input');
 const sfxToggle = document.querySelector('.sound-option:nth-child(3) input');
 const highScoreText = document.querySelector('.high-score-text');
 
-// Get the settings panel elements
+// Settings and game over panels
 const settingsPanel = document.getElementById('settingsPanel');
 const gameOverPanel = document.getElementById('gameOverPanel');
 const restartButton = document.getElementById('restartButton');
@@ -31,10 +36,12 @@ const mainMenuButtonGameOver = document.getElementById('mainMenuButtonGameOver')
 const finalScore = document.getElementById('finalScore');
 const finalHighScore = document.getElementById('finalHighScore');
 
+// Canvas dimensions
 canvas.width = 1200;
 canvas.height = 600;
 
-// Load images
+// Load game assets
+// Images
 const bg = new Image();
 const topPipe = new Image();
 const bottomPipe = new Image();
@@ -47,7 +54,7 @@ bottomPipe.src = 'img/bottompipe.png';
 enemies.src = 'img/redbird.png';
 heartImage.src = 'img/heart.png';
 
-// Load audio
+// Audio
 const bgMusic = new Audio('audio/bgm_mario.mp3');
 const flapSound = new Audio('audio/sfx_wing.wav');
 const pointSound = new Audio('audio/sfx_point.wav');
@@ -55,7 +62,7 @@ const hitSound = new Audio('audio/sfx_hit.wav');
 const dieSound = new Audio('audio/sfx_die.wav');
 const swooshSound = new Audio('audio/sfx_swooshing.wav');
 
-// Define levelConfig
+// Level configuration
 const levelConfig = {
     1: { pipeSpeed: 1.5, pipeInterval: 3000, gravity: 0.2, pipeGap: 240, requiredScore: 5, pipeOscillation: 0 },
     2: { pipeSpeed: 2, pipeInterval: 2600, gravity: 0.25, pipeGap: 200, requiredScore: 10, pipeOscillation: 0 },
@@ -64,18 +71,16 @@ const levelConfig = {
     5: { pipeSpeed: 3.5, pipeInterval: 1400, gravity: 0.32, pipeGap: 100, requiredScore: 25, pipeOscillation: 2 }
 };
 
-// Initialize the game
+// Game state variables
 let game;
 let startTime;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameAnimationId; // Store the animation frame ID for pausing
 let isPaused = false;
 
-// Initialize hearts
-let hearts = [];
-let lives = 1; // Starting number of lives
-
-// Update high score text
+/**
+ * Update high score display in UI
+ */
 function updateHighScoreDisplay() {
     highScoreText.textContent = `High Score: ${highScore}`;
     finalHighScore.textContent = highScore;
@@ -85,6 +90,7 @@ function updateHighScoreDisplay() {
 updateHighScoreDisplay();
 
 // Event listeners for buttons
+// Start button
 startButton.addEventListener('click', () => {
     startScreen.style.display = 'none';
     canvas.style.display = 'block';
@@ -102,26 +108,27 @@ startButton.addEventListener('click', () => {
     gameAnimationId = requestAnimationFrame(gameLoop);
 });
 
-// Toggle between option button and options container
+// Options button
 optionButton.addEventListener('click', () => {
     boxButton.style.display = 'none';
     optionsContainer.style.display = 'block';
     updateHighScoreDisplay();
 });
 
-// Close options and show buttons again
+// Close options button
 closeBtn.addEventListener('click', () => {
     optionsContainer.style.display = 'none';
     boxButton.style.display = 'flex';
 });
 
-// Reset high score
+// Reset high score button
 resetBtn.addEventListener('click', () => {
     highScore = 0;
     localStorage.setItem('highScore', highScore);
     updateHighScoreDisplay();
 });
 
+// Exit button
 exitButton.addEventListener('click', () => {
     if (confirm('Are you sure you want to exit the game?')) {
         window.close(); // Note: This may not work in all browsers due to security restrictions
@@ -130,12 +137,12 @@ exitButton.addEventListener('click', () => {
     }
 });
 
-// Music toggle functionality
+// Music toggle
 musicToggle.addEventListener('change', () => {
     bgMusic.muted = !musicToggle.checked;
 });
 
-// SFX toggle functionality
+// SFX toggle
 sfxToggle.addEventListener('change', () => {
     flapSound.muted = !sfxToggle.checked;
     pointSound.muted = !sfxToggle.checked;
@@ -145,6 +152,7 @@ sfxToggle.addEventListener('change', () => {
 });
 
 // Settings panel buttons
+// Restart button
 restartButton.addEventListener('click', () => {
     settingsPanel.style.display = 'none';
     gameOverPanel.style.display = 'none';
@@ -155,12 +163,14 @@ restartButton.addEventListener('click', () => {
     }
 });
 
+// Continue button
 continueButton.addEventListener('click', () => {
     settingsPanel.style.display = 'none';
     isPaused = false;
     gameAnimationId = requestAnimationFrame(gameLoop);
 });
 
+// Settings options button
 settingsOptionButton.addEventListener('click', () => {
     // Show options within the settings panel
     updateHighScoreDisplay();
@@ -180,11 +190,13 @@ settingsOptionButton.addEventListener('click', () => {
     });
 });
 
+// Main menu button
 mainMenuButton.addEventListener('click', () => {
     returnToMainMenu();
 });
 
 // Game over panel buttons
+// Restart button
 restartButtonGameOver.addEventListener('click', () => {
     gameOverPanel.style.display = 'none';
     if (game) {
@@ -194,35 +206,38 @@ restartButtonGameOver.addEventListener('click', () => {
     }
 });
 
+// Main menu button
 mainMenuButtonGameOver.addEventListener('click', () => {
     returnToMainMenu();
 });
 
-
+/**
+ * Return to the main menu from game
+ */
 function returnToMainMenu() {
-    // Hủy khung hình động
+    // Cancel animation frame
     cancelAnimationFrame(gameAnimationId);
     
-    // Ẩn tất cả các bảng điều khiển và đảm bảo gameOverPanel được ẩn hoàn toàn
+    // Hide all panels and ensure game over panel is completely hidden
     settingsPanel.style.display = 'none';
     gameOverPanel.style.display = 'none';
     canvas.style.display = 'none';
     
-    // Đặt lại vị trí của optionsContainer nếu nó đã bị di chuyển
+    // Reset options container position if it was moved
     document.body.appendChild(optionsContainer);
     optionsContainer.style.display = 'none';
     
-    // Hiển thị màn hình bắt đầu
+    // Show start screen
     startScreen.style.display = 'flex';
     boxButton.style.display = 'flex';
     
-    // Dừng nhạc nền
+    // Stop background music
     bgMusic.pause();
     bgMusic.currentTime = 0;
     
     isPaused = false;
     
-    // Đảm bảo game được reset khi quay lại main menu
+    // Ensure game is reset when returning to main menu
     if (game) {
         game = null;
     }
@@ -248,8 +263,44 @@ document.addEventListener('keydown', (e) => {
         isPaused = false;
         gameAnimationId = requestAnimationFrame(gameLoop);
     }
+    
+    // Up arrow or W key for vertical movement
+    if ((e.code === 'ArrowUp' || e.code === 'KeyW') && game && !game.gameOver && !isPaused) {
+        game.player.moveUp();
+    }
+    
+    // Down arrow or S key for vertical movement
+    if ((e.code === 'ArrowDown' || e.code === 'KeyS') && game && !game.gameOver && !isPaused) {
+        game.player.moveDown();
+    }
 });
 
+// Add continuous movement for arrow keys
+const keysPressed = {};
+
+document.addEventListener('keydown', (e) => {
+    keysPressed[e.code] = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    keysPressed[e.code] = false;
+});
+
+// Function to handle continuous movement
+function handleContinuousMovement() {
+    if (game && !game.gameOver && !isPaused && game.player.hasPointerPowerUp) {
+        if (keysPressed['ArrowUp'] || keysPressed['KeyW']) {
+            game.player.moveUp();
+        }
+        if (keysPressed['ArrowDown'] || keysPressed['KeyS']) {
+            game.player.moveDown();
+        }
+    }
+}
+
+/**
+ * Toggle game pause state
+ */
 function togglePause() {
     if (isPaused) {
         // Resume game
@@ -264,6 +315,7 @@ function togglePause() {
     }
 }
 
+// Event listener for mouse click to flap
 document.addEventListener('click', () => {
     if (game && !game.gameOver && !isPaused) {
         if (!sfxToggle.checked) {
@@ -278,16 +330,24 @@ document.addEventListener('click', () => {
     }
 });
 
-// Function to show game over panel
+/**
+ * Show game over panel with final score
+ */
 function showGameOverPanel() {
     finalScore.textContent = game.score;
     finalHighScore.textContent = highScore;
     gameOverPanel.style.display = 'flex';
 }
 
-// Main game loop
+/**
+ * Main game loop
+ * @param {number} timestamp - Current animation timestamp
+ */
 function gameLoop(timestamp) {
     if (game && !isPaused) {
+        // Handle continuous movement for arrow keys
+        handleContinuousMovement();
+        
         game.update(timestamp);
         game.draw(ctx, timestamp);
         
@@ -308,7 +368,9 @@ function gameLoop(timestamp) {
     }
 }
 
-// Add a button to the canvas for pausing
+/**
+ * Add a pause button to the canvas
+ */
 function addPauseButton() {
     const pauseButton = document.createElement('button');
     pauseButton.id = 'pauseButton';
