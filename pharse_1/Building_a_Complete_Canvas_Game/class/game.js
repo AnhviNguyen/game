@@ -132,7 +132,10 @@ export class Game {
             // Create and update obstacles
             this.obstacleManager.update(timestamp, config);
 
-            // Check for collisions
+            // Always check for pipe passing to increment score, regardless of power-up status
+            this.collisionManager.checkPipePassing();
+            
+            // Check for collisions (this will skip collision detection if power-ups are active)
             this.collisionManager.checkCollisions();
             
             // Check for level progression
@@ -203,7 +206,32 @@ export class Game {
             this.levelManager.showLevelUp = false;
             this.levelManager.currentLevel++;
             this.levelManager.updateBackground();
+            
+            // Reset all power-ups when transitioning to a new level
+            this.resetPowerUps();
         }
+    }
+    
+    /**
+     * Reset all power-up states
+     * This is called when transitioning to a new level
+     */
+    resetPowerUps() {
+        // Reset speech power-up
+        this.isSpeechActive = false;
+        this.speechEffectStartTime = null;
+        
+        // Reset pointer power-up on player
+        this.player.hasPointerPowerUp = false;
+        this.player.pointerPowerUpStartTime = null;
+        
+        // Reset power-up managers
+        this.powerUpManager.reset();
+        
+        // Reset clones
+        this.cloneManager.reset();
+        
+        console.log("All power-ups reset for new level");
     }
     
     /**
@@ -238,7 +266,7 @@ export class Game {
             ctx.fillStyle = 'white';
             ctx.font = '16px Arial';
             ctx.fillText('Pointer Power-Up Active!', 20, 30);
-            ctx.fillText('Use ↑↓ or W/S keys to move freely', 20, 55);
+            ctx.fillText('Use ↑↓ or W/S keys to move freely (still vulnerable)', 20, 55);
         }
     }
 
@@ -257,9 +285,6 @@ export class Game {
      * Reset the current level
      */
     resetCurrentLevel() {
-        // Save the current pointer power-up state
-        const hasPointerPowerUp = this.player.hasPointerPowerUp;
-        
         this.player.reset();
         this.pipes = [];
         this.enemyBirds = [];
@@ -270,11 +295,14 @@ export class Game {
         this.bgMusic.currentTime = 0;
         this.bgMusic.play();
         
-        // Reset managers
+        // Reset all power-ups
         this.powerUpManager.reset();
         this.cloneManager.reset();
         
-        // Restore the pointer power-up state
-        this.player.hasPointerPowerUp = hasPointerPowerUp;
+        // Ensure pointer power-up is reset
+        this.player.hasPointerPowerUp = false;
+        this.player.pointerPowerUpStartTime = null;
+        
+        console.log("All power-ups reset for current level");
     }
 }

@@ -298,8 +298,8 @@ export class PowerUpManager {
                 this.game.player.y < pointer.y + pointer.height &&
                 this.game.player.y + 24 > pointer.y) {
                 
-                // Activate pointer power-up
-                this.game.player.hasPointerPowerUp = true;
+                // Activate pointer power-up using the new method
+                this.game.player.activatePointerPowerUp();
                 
                 // Remove the collected pointer
                 this.pointerPowerups.splice(index, 1);

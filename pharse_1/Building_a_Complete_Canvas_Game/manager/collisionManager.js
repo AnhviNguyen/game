@@ -19,12 +19,7 @@ export class CollisionManager {
             return;
         }
 
-        // Skip collision detection when pointer power-up is active
-        if (this.game.player.hasPointerPowerUp) {
-            return;
-        }
-
-        // Check main player collision
+        // Check main player collision (even with pointer power-up active)
         if (this.checkPlayerCollision(this.game.player)) {
             if (this.game.cloneManager.getCloneCount() > 0) {
                 this.game.cloneManager.replacePlayerWithClone();
@@ -35,6 +30,25 @@ export class CollisionManager {
 
         // Check clone collisions
         this.checkCloneCollisions();
+    }
+    
+    /**
+     * Check if player has passed pipes to increment score
+     * This is separate from collision detection to ensure score increments
+     * even when power-ups are active
+     */
+    checkPipePassing() {
+        for (let pipe of this.game.pipes) {
+            // Check if player has passed the pipe (regardless of power-up status)
+            if (this.game.player.x + 34 > pipe.x + 26 && this.game.player.x < pipe.x + 52) {
+                // Score point when passing pipe center
+                if (!pipe.passed) {
+                    this.game.score++;
+                    pipe.passed = true;
+                    this.game.pointSound.play();
+                }
+            }
+        }
     }
     
     /**
@@ -74,10 +88,9 @@ export class CollisionManager {
      * @returns {boolean} - True if collision detected
      */
     checkPlayerCollision(player) {
-        // Skip collision detection for main player when pointer power-up is active
-        if (player === this.game.player && player.hasPointerPowerUp) {
-            return false;
-        }
+        // With pointer power-up, player can still collide with pipes and enemies
+        // but not with screen boundaries
+        const isMainPlayerWithPointer = player === this.game.player && player.hasPointerPowerUp;
 
         // Check pipe collisions
         for (let pipe of this.game.pipes) {
@@ -87,13 +100,6 @@ export class CollisionManager {
                     (player.y < pipe.topHeight || 
                      player.y + 24 > pipe.topHeight + pipe.pipeGap)) {
                     return true;
-                }
-                
-                // Score point when passing pipe (only for main player)
-                if (!pipe.passed && player === this.game.player) {
-                    this.game.score++;
-                    pipe.passed = true;
-                    this.game.pointSound.play();
                 }
             }
         }
@@ -113,8 +119,8 @@ export class CollisionManager {
             }
         }
 
-        // Check screen boundary collisions
-        if (player.y < 0 || player.y + 24 > this.game.canvas.height) {
+        // Check screen boundary collisions (skip for player with pointer power-up)
+        if (!isMainPlayerWithPointer && (player.y < 0 || player.y + 24 > this.game.canvas.height)) {
             return true;
         }
 

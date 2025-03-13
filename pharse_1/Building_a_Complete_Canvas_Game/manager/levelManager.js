@@ -57,6 +57,10 @@ export class LevelManager {
                 this.levelTransitionStartTime = timestamp;
                 this.isLevelTransition = true;
                 this.swooshSound.play();
+                
+                // Log level transition
+                console.log(`Transitioning to level ${this.currentLevel + 1}`);
+                
                 return true;
             }
         }

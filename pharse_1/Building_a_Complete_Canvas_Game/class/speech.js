@@ -27,16 +27,22 @@ export class Speech {
      */
     applyEffect(player, game) {
         const originalPipeSpeed = game.levelManager.getCurrentConfig().pipeSpeed;
+        
+        // Increase pipe speed (which effectively increases player speed relative to pipes)
         game.levelManager.getCurrentConfig().pipeSpeed *= 5;
 
         // Save current collision state
         game.isSpeechActive = true;
         game.speechEffectStartTime = Date.now();
 
+        // Display a message about the power-up
+        console.log("Speech power-up activated! Invincibility and speed boost for 3 seconds.");
+
         // Reset effect after 3 seconds
         setTimeout(() => {
             game.levelManager.getCurrentConfig().pipeSpeed = originalPipeSpeed;
             game.isSpeechActive = false;
+            console.log("Speech power-up effect ended.");
         }, 3000);
     }
 } 

@@ -68,7 +68,8 @@ const levelConfig = {
     2: { pipeSpeed: 2, pipeInterval: 2600, gravity: 0.25, pipeGap: 200, requiredScore: 10, pipeOscillation: 0 },
     3: { pipeSpeed: 2.5, pipeInterval: 2200, gravity: 0.28, pipeGap: 160, requiredScore: 15, pipeOscillation: 1 },
     4: { pipeSpeed: 3, pipeInterval: 1800, gravity: 0.3, pipeGap: 120, requiredScore: 20, pipeOscillation: 1.5 },
-    5: { pipeSpeed: 3.5, pipeInterval: 1400, gravity: 0.32, pipeGap: 100, requiredScore: 25, pipeOscillation: 2 }
+    5: { pipeSpeed: 3.5, pipeInterval: 1400, gravity: 0.32, pipeGap: 100, requiredScore: 25, pipeOscillation: 2 },
+    6: { pipeSpeed: 4, pipeInterval: 1100, gravity: 0.35, pipeGap: 80, requiredScore: 30, pipeOscillation: 2.3 }
 };
 
 // Game state variables
