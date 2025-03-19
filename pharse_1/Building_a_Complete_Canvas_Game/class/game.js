@@ -205,6 +205,12 @@ export class Game {
             this.levelManager.isLevelTransition = false;
             this.levelManager.showLevelUp = false;
             this.levelManager.currentLevel++;
+
+             // Check if game is completed (all levels finished)
+            if (this.levelManager.currentLevel > 1) {
+                this.handleGameCompletion();
+                return;
+            }
             this.levelManager.updateBackground();
             
             // Reset all power-ups when transitioning to a new level
@@ -304,5 +310,27 @@ export class Game {
         this.player.pointerPowerUpStartTime = null;
         
         console.log("All power-ups reset for current level");
+    }
+
+    /**
+     * Handle game completion when all levels are finished
+     */
+    handleGameCompletion() {
+        this.gameOver = true;
+        this.bgMusic.pause();
+        this.bgMusic.currentTime = 0;
+        this.highScore = Math.max(this.highScore, this.score);
+        
+        // Show game over panel with completion message
+        const gameOverPanel = document.getElementById('gameOverPanel');
+        const settingsTitle = gameOverPanel.querySelector('.settings-title');
+        settingsTitle.textContent = 'CONGRATULATIONS!';
+        
+        // Update final scores
+        document.getElementById('finalScore').textContent = this.score;
+        document.getElementById('finalHighScore').textContent = this.highScore;
+        
+        // Show the game over panel
+        gameOverPanel.style.display = 'flex';
     }
 }
